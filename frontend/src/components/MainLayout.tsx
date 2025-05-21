@@ -8,6 +8,8 @@ function MainLayout() {
       <Navbar />
       {/* Path rendered Pages */}
       <Outlet />
+      
+      {/* Sherpa AI */}
       {/* Footer */}
     </div>
   );

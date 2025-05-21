@@ -26,7 +26,9 @@ const SearchBar = () => {
       onSubmit={handleSearch}
       className="focus-within:ring-primary mx-auto flex w-full max-w-md items-center justify-between rounded-full border border-gray-300 bg-white py-2 pr-2 pl-4 shadow-sm focus-within:ring-2"
     >
+      {/* 1 */}
       <MapPin color="gray" height={25} width={22} />
+      {/* 2 */}
       <input
         type="text"
         value={query}
@@ -34,6 +36,7 @@ const SearchBar = () => {
         placeholder="Search Destinations"
         className="grow px-3 py-2 text-base placeholder-gray-400 outline-none"
       />
+      {/* 3 */}
       <button
         type="submit"
         className="bg-primary flex h-12 w-12 items-center justify-center rounded-full"
