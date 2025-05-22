@@ -8,7 +8,7 @@ const LandingPage = () => {
       <SearchScreen />
       <CategoryTabs />
       <Misc />
-    </div>
+  </div>
   );
 };
 
