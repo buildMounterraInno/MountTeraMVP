@@ -1,0 +1,41 @@
+import { useState } from 'react';
+import PlacesToSee from './tabs/PlacesToSee';
+import ThingsToDo from './tabs/ThingsToDo';
+import Events from './tabs/Events';
+
+type CategoryId = 'Treks' | 'Experience' | 'Events';
+
+export default function CategoryTabs() {
+  const [activeTab, setActiveTab] = useState<CategoryId>('Treks');
+
+  const categories: { id: CategoryId; label: string }[] = [
+    { id: 'Treks', label: 'Treks' },
+    { id: 'Experience', label: 'Experience' },
+    { id: 'Events', label: 'Events' },
+  ];
+
+  return (
+    <div className="max-h-screen w-full bg-white">
+      {/* Tabs Container */}
+      <div className="flex -translate-y-13 justify-around sm:px-4">
+        {categories.map((category) => (
+          <button
+            key={category.id}
+            className={`font-tpc rounded-t-lg px-4 pt-2 pb-4 text-lg font-medium transition-colors focus:outline-none sm:px-6 sm:pb-3 sm:text-2xl ${
+              activeTab === category.id ? 'bg-white text-black' : 'text-white'
+            }`}
+            onClick={() => setActiveTab(category.id)}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+      {/* Content */}
+      <div className="px-4 sm:px-8">
+        {activeTab === 'Treks' && <PlacesToSee />}
+        {activeTab === 'Experience' && <ThingsToDo />}
+        {activeTab === 'Events' && <Events />}
+      </div>
+    </div>
+  );
+}
