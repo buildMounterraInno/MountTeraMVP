@@ -8,23 +8,23 @@ const TrekTile: React.FC<Trek> = ({
 }) => {
   return (
     <article
-      className="rounded-lg bg-transparent p-4 shadow-md transition-shadow hover:shadow-lg"
+      className="relative h-50 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-shadow hover:shadow-lg"
+      style={{ backgroundImage: `url(${destinationImage})` }}
       aria-labelledby={`trek-title-${placeName}`}
     >
-      <img
-        src={destinationImage}
-        alt={`${placeName} landscape`}
-        className="mb-3 h-32 w-full rounded-md object-cover"
-        loading="lazy"
-      />
-      <h3
-        id={`trek-title-${placeName}`}
-        className="text-lg font-semibold text-gray-800"
-      >
-        {placeName}
-      </h3>
-      <p className="text-sm text-gray-600">{state}</p>
-      <p className="text-sm text-gray-500">{coordinates}</p>
+      {/* Overlay for gradient */}
+      <div className="to-[#D9D9D9]-200/10 absolute inset-0 z-0 bg-gradient-to-t from-black/40"></div>
+
+      <div className="absolute bottom-3 left-3 z-10">
+        <h3
+          id={`trek-title-${placeName}`}
+          className="text-lg font-semibold text-white"
+        >
+          {placeName}
+        </h3>
+        <p className="text-sm text-white/90">{state}</p>
+        <p className="text-sm text-white/80">{coordinates}</p>
+      </div>
     </article>
   );
 };
@@ -34,7 +34,9 @@ const Treks: React.FC = () => {
 
   return (
     <section className="rounded-lg bg-gray-100 p-6 shadow-md">
-      <h2 className="mb-4 text-2xl font-bold text-gray-800">Popular Treks</h2>
+      <h2 className="mb-4 text-2xl font-bold text-gray-800">
+        Unforgettable Adventure Awaits
+      </h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {displayedTreks.map((trek) => (
           <TrekTile key={trek.id} {...trek} />
