@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import PlacesToSee from './tabs/PlacesToSee';
-import ThingsToDo from './tabs/ThingsToDo';
+import PlacesToSee from './tabs/Treks';
+import ThingsToDo from './tabs/Experience';
 import Events from './tabs/Events';
 
 type CategoryId = 'places' | 'things' | 'events';
@@ -17,11 +17,11 @@ export default function CategoryTabs() {
   return (
     <div className="max-h-screen w-full bg-white">
       {/* Tabs Container */}
-      <div className="flex justify-around -translate-y-13 sm:px-4">
+      <div className="flex -translate-y-13 justify-around sm:px-4">
         {categories.map((category) => (
           <button
             key={category.id}
-            className={`font-tpc px-4 pt-2 sm:px-6 pb-4 sm:pb-3 rounded-t-lg text-lg sm:text-2xl font-medium transition-colors focus:outline-none ${
+            className={`font-tpc rounded-t-lg px-4 pt-2 pb-4 text-lg font-medium transition-colors focus:outline-none sm:px-6 sm:pb-3 sm:text-2xl ${
               activeTab === category.id ? 'bg-white text-black' : 'text-white'
             }`}
             onClick={() => setActiveTab(category.id)}
