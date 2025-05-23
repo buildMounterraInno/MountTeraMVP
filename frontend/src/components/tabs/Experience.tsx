@@ -33,7 +33,7 @@ const Experience = () => {
   const displayedTreks = experiences.slice(0, 6);
 
   return (
-    <section className="rounded-lg bg-gray-100 p-6 shadow-md">
+    <section className="rounded-lg bg-gray-200 p-6 shadow-md">
       <h2 className="mb-4 text-2xl font-bold text-gray-800">
         Experience the Magic
       </h2>

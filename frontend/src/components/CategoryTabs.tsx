@@ -15,7 +15,7 @@ export default function CategoryTabs() {
   ];
 
   return (
-    <div className="max-h-screen w-full bg-white">
+    <div className="w-full bg-[#F2F2F2]">
       {/* Tabs Container */}
       <div className="flex -translate-y-13 justify-around sm:px-4">
         {categories.map((category) => (

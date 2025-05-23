@@ -8,7 +8,7 @@ const SocialTile: React.FC<Social> = ({
 }) => {
   return (
     <article
-      className="relative h-50 w-60 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-shadow hover:shadow-lg"
+      className="relative h-40 w-50 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-shadow hover:shadow-lg sm:h-45 sm:w-55"
       style={{ backgroundImage: `url(${backgroundImage})` }}
       aria-labelledby={`trek-title-${profileName}`}
     >
@@ -34,7 +34,7 @@ const SocialProfiles = () => {
   const displayedProfiles = socials.slice(0, 6);
 
   return (
-    <div className="flex gap-6">
+    <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:gap-6">
       {displayedProfiles.map((event) => (
         <SocialTile key={event.id} {...event} />
       ))}
