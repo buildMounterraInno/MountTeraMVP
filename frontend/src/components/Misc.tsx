@@ -6,14 +6,14 @@ import SocialProfiles from './Misc/SocialProfiles';
 
 const Misc = () => {
   return (
-    <div className="relative flex flex-col gap-3 bg-[#F2F2F2] px-8 py-6">
+    <div className="relative flex flex-col gap-3 bg-[#F2F2F2] px-8 pb-6">
       {/* Title */}
-      <div className="font-tpc text-3xl font-semibold text-[#FD5700]">
+      <div className="font-tpc text-2xl font-semibold text-[#FD5700] sm:text-3xl">
         Ready for your next journey ?
       </div>
 
       {/* Phrase */}
-      <div className="font-tpc text-xl">
+      <div className="font-tpc text-lg sm:text-xl">
         Tag us <span className="font-bold">@TripPeChaloge</span> and use
         <span className="font-bold"> #OutSocial</span> and you might just get
         featured!
