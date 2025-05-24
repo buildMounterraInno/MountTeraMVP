@@ -17,12 +17,14 @@ export default function CategoryTabs() {
   return (
     <div className="w-full bg-[#F2F2F2]">
       {/* Tabs Container */}
-      <div className="flex -translate-y-13 justify-around sm:px-4">
+      <div className="flex -translate-y-12 justify-around sm:px-4">
         {categories.map((category) => (
           <button
             key={category.id}
-            className={`font-tpc rounded-t-lg px-4 pt-2 pb-4 text-lg font-medium transition-colors focus:outline-none sm:px-6 sm:pb-3 sm:text-2xl ${
-              activeTab === category.id ? 'bg-white text-black' : 'text-white'
+            className={`font-tpc rounded-t-lg px-4 pt-2 pb-4 text-lg font-medium transition-colors focus:outline-none sm:px-6 sm:pb-2 sm:text-2xl ${
+              activeTab === category.id
+                ? 'bg-[#F2F2F2] text-black'
+                : 'text-white'
             }`}
             onClick={() => setActiveTab(category.id)}
           >
