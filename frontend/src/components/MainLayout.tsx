@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './common/Navbar';
-// import Footer from './common/Footer';
+import Footer from './common/Footer';
 
 function MainLayout() {
   return (
@@ -11,7 +11,7 @@ function MainLayout() {
       <Outlet />
       {/* Sherpa AI - WIP */}
       {/* Footer */}
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 }

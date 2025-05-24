@@ -6,7 +6,7 @@ import SocialProfiles from './Misc/SocialProfiles';
 
 const Misc = () => {
   return (
-    <div className="relative flex flex-col gap-3 bg-[#F2F2F2] px-8 pb-6">
+    <div className="relative flex flex-col gap-4 bg-[#F2F2F2] px-8 pb-6">
       {/* Title */}
       <div className="font-tpc text-2xl font-semibold text-[#FD5700] sm:text-3xl">
         Ready for your next journey ?
