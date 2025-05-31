@@ -7,6 +7,7 @@ import ValleyOfFlowersTrek from './pages/ValleyOfFlowersTrek';
 import KashmirGreatLakesTrek from './pages/KashmirGreatLakesTrek';
 import ChadarTrek from './pages/ChadarTrek';
 import RoopkundTrek from './pages/RoopkundTrek';
+import SearchResults from './pages/SearchResults';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/pages/HamptaPassTrek" element={<HamptaPassTrek />} />
           <Route path="/pages/KedarkanthaTrek" element={<KedarkanthaTrek />} />
           <Route

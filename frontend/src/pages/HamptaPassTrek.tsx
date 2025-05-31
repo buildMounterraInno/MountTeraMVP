@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
+import { treks } from '../data/trek';
+import SearchBar from '../components/common/SearchBar';
+
+// Get the trek data
+const trekData = treks.find((trek) => trek.placeName === 'Hampta Pass Trek');
 
 const images = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
+  trekData?.destinationImage ||
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8MHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1477346611705-65d1883cee1e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8MHx8&auto=format&fit=crop&w=2940&q=80',
 ];
@@ -215,16 +221,20 @@ const HamptaPassTrek = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-gray-100"></div>
       </div>
 
-      {/* Content */}
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 pt-24 pb-12">
+          {/* Search Bar Section */}
+          <div className="mb-8">
+            <SearchBar />
+          </div>
+
           {/* Hero Section with white text */}
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="md:w-1/2">
               <div className="overflow-hidden rounded-2xl shadow-lg">
                 <img
                   src={images[0]}
-                  alt="Hampta Pass"
+                  alt="Hampta Pass Trek"
                   className="h-96 w-full object-cover"
                 />
               </div>
@@ -236,16 +246,16 @@ const HamptaPassTrek = () => {
               </h1>
               <p className="text-gray-200">📍 Manali, Himachal Pradesh</p>
               <p className="text-sm text-gray-300">
-                The Hampta Pass trek is one of the most popular and rewarding
-                treks in Himachal Pradesh. This moderate-level trek offers an
-                incredible diversity of landscapes – from the lush green valleys
-                of Kullu to the stark, desert-like terrain of Lahaul and Spiti.
+                The Hampta Pass Trek is a stunning crossover trek that connects
+                the lush Kullu Valley to the barren Spiti region. Experience
+                dramatic changes in landscape as you traverse through diverse
+                terrains and beautiful meadows.
               </p>
 
               <div className="flex gap-4 text-sm text-gray-200">
-                <p>🕒 4–6 Days</p>
+                <p>🕒 5 Days</p>
                 <p>⛰️ 14,100 ft</p>
-                <p>📅 June to October</p>
+                <p>📅 June to September</p>
               </div>
 
               <div>
@@ -260,12 +270,12 @@ const HamptaPassTrek = () => {
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {[
+                    'Crossover Trek',
                     'Chandratal Lake',
-                    'Hampta Valley',
-                    'Beas Kund',
-                    'Chika Meadows',
-                    'Pir Panjal Views',
-                    'Desert Landscapes',
+                    'Diverse Terrain',
+                    'Mountain Views',
+                    'Alpine Meadows',
+                    'River Crossing',
                   ].map((tag) => (
                     <span
                       key={tag}

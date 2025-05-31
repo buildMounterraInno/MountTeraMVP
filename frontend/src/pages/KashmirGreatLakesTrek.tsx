@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
+import { treks } from '../data/trek';
+import SearchBar from '../components/common/SearchBar';
+
+// Get the trek data
+const trekData = treks.find(
+  (trek) => trek.placeName === 'Kashmir Great Lakes Trek'
+);
 
 const images = [
-  'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
+  trekData?.destinationImage ||
+    'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1486911278844-a81c5267e227?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
 ];
@@ -215,9 +223,13 @@ const KashmirGreatLakesTrek = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-gray-100"></div>
       </div>
 
-      {/* Content */}
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 pt-24 pb-12">
+          {/* Search Bar Section */}
+          <div className="mb-8">
+            <SearchBar />
+          </div>
+
           {/* Hero Section with white text */}
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="md:w-1/2">
@@ -261,9 +273,9 @@ const KashmirGreatLakesTrek = () => {
                 <div className="flex flex-wrap gap-2">
                   {[
                     'Alpine Lakes',
+                    'Mountain Passes',
                     'Meadows',
                     'Glaciers',
-                    'Mountain Views',
                     'Wildlife',
                     'Camping',
                   ].map((tag) => (

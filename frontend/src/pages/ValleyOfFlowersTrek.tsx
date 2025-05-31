@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
+import { treks } from '../data/trek';
+import SearchBar from '../components/common/SearchBar';
+
+// Get the trek data
+const trekData = treks.find(
+  (trek) => trek.placeName === 'Valley of Flowers Trek'
+);
 
 const images = [
-  'https://images.unsplash.com/photo-1501555088652-021faa106b9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
+  trekData?.destinationImage ||
+    'https://images.unsplash.com/photo-1501555088652-021faa106b9b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1496429862132-5ab36b6ae330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
 ];
@@ -211,9 +219,13 @@ const ValleyOfFlowersTrek = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-gray-100"></div>
       </div>
 
-      {/* Content */}
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 pt-24 pb-12">
+          {/* Search Bar Section */}
+          <div className="mb-8">
+            <SearchBar />
+          </div>
+
           {/* Hero Section with white text */}
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="md:w-1/2">
@@ -232,22 +244,21 @@ const ValleyOfFlowersTrek = () => {
               </h1>
               <p className="text-gray-200">📍 Govindghat, Uttarakhand</p>
               <p className="text-sm text-gray-300">
-                The Valley of Flowers Trek is a mesmerizing journey through one
-                of India's most beautiful national parks. This UNESCO World
-                Heritage site comes alive during the monsoon season with
-                hundreds of species of alpine flowers, creating a colorful
-                paradise in the Himalayas.
+                The Valley of Flowers Trek takes you through a UNESCO World
+                Heritage site famous for its meadows of endemic alpine flowers
+                and variety of flora. This moderate trek offers stunning views
+                of colorful flowers against the backdrop of mighty Himalayas.
               </p>
 
               <div className="flex gap-4 text-sm text-gray-200">
-                <p>🕒 6-7 Days</p>
+                <p>🕒 6 Days</p>
                 <p>⛰️ 11,500 ft</p>
                 <p>📅 July to September</p>
               </div>
 
               <div>
-                <span className="rounded-full bg-green-400/90 px-2.5 py-0.5 text-xs font-semibold text-green-900">
-                  Easy to Moderate
+                <span className="rounded-full bg-yellow-400/90 px-2.5 py-0.5 text-xs font-semibold text-yellow-900">
+                  Moderate
                 </span>
               </div>
 
@@ -260,8 +271,8 @@ const ValleyOfFlowersTrek = () => {
                     'Alpine Flowers',
                     'UNESCO Site',
                     'Hemkund Sahib',
-                    'Biodiversity',
                     'Valley Views',
+                    'Biodiversity',
                     'Photography',
                   ].map((tag) => (
                     <span

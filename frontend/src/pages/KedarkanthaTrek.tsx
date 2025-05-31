@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
+import { treks } from '../data/trek';
+import SearchBar from '../components/common/SearchBar';
+
+// Get the trek data
+const trekData = treks.find((trek) => trek.placeName === 'Kedarkantha Trek');
 
 const images = [
-  'https://images.unsplash.com/photo-1486911278844-a81c5267e227?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
+  trekData?.destinationImage ||
+    'https://images.unsplash.com/photo-1486911278844-a81c5267e227?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1485470733090-0aae1788d5af?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
   'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80',
 ];
@@ -211,9 +217,13 @@ const KedarkanthaTrek = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-gray-100"></div>
       </div>
 
-      {/* Content */}
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 pt-24 pb-12">
+          {/* Search Bar Section */}
+          <div className="mb-8">
+            <SearchBar />
+          </div>
+
           {/* Hero Section with white text */}
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="md:w-1/2">
@@ -234,9 +244,8 @@ const KedarkanthaTrek = () => {
               <p className="text-sm text-gray-300">
                 The Kedarkantha trek is one of the most popular winter treks in
                 India. Located in the Uttarkashi district of Uttarakhand, this
-                trek offers stunning views of snow-capped peaks, dense forests,
-                and beautiful meadows. Perfect for beginners, it combines easy
-                terrain with breathtaking Himalayan views.
+                trek offers stunning views of the Himalayan peaks and a chance
+                to experience snow-covered trails.
               </p>
 
               <div className="flex gap-4 text-sm text-gray-200">
@@ -246,7 +255,7 @@ const KedarkanthaTrek = () => {
               </div>
 
               <div>
-                <span className="rounded-full bg-green-400/90 px-2.5 py-0.5 text-xs font-semibold text-green-900">
+                <span className="rounded-full bg-yellow-400/90 px-2.5 py-0.5 text-xs font-semibold text-yellow-900">
                   Easy to Moderate
                 </span>
               </div>

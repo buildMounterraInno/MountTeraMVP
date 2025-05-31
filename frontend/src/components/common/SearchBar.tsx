@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Search, Plus, Minus } from 'lucide-react';
+import { Search, Plus, Minus, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 type SearchSection = 'where' | 'from' | 'who' | null;
 
@@ -14,18 +15,20 @@ interface SearchData {
 }
 
 const baseButtonStyle = 'relative cursor-pointer transition-all';
-const activeButtonStyle = 'bg-blue-500';
-const hoverButtonStyle = 'hover:bg-gray-100';
+const activeButtonStyle = 'bg-gray-100';
+const hoverButtonStyle = 'hover:bg-gray-50';
 const roundedStyle = 'rounded-[32px]';
 
 const SearchBar = () => {
   const [activeSection, setActiveSection] = useState<SearchSection>(null);
+  const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const [searchData, setSearchData] = useState<SearchData>({
     destination: '',
     fromDate: undefined,
     adults: 0,
   });
   const searchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,12 +45,19 @@ const SearchBar = () => {
   }, []);
 
   const handleSearch = useCallback(() => {
-    console.log({
-      destination: searchData.destination,
-      from: searchData.fromDate,
-      adults: searchData.adults,
-    });
-  }, [searchData]);
+    const searchParams = new URLSearchParams();
+    if (searchData.destination) {
+      searchParams.set('destination', searchData.destination);
+    }
+    if (searchData.fromDate) {
+      searchParams.set('date', format(searchData.fromDate, 'yyyy-MM-dd'));
+    }
+    if (searchData.adults > 0) {
+      searchParams.set('adults', searchData.adults.toString());
+    }
+    setIsMobileModalOpen(false);
+    navigate(`/search?${searchParams.toString()}`);
+  }, [searchData, navigate]);
 
   return (
     <div
@@ -113,18 +123,126 @@ const SearchBar = () => {
       {/* Mobile Search Bar */}
       <div className="md:hidden">
         <button
-          onClick={() => setActiveSection('where')}
+          onClick={() => setIsMobileModalOpen(true)}
           className="flex w-full items-center gap-4 rounded-full border border-gray-200 bg-white px-6 py-4 shadow-md"
         >
           <Search size={20} className="text-gray-600" />
           <div className="flex-1 text-left">
             <p className="text-sm font-medium text-gray-800">Where to?</p>
             <p className="text-xs text-gray-500">
-              Anywhere • Any week • Add guests
+              {searchData.destination || 'Anywhere'} •{' '}
+              {searchData.fromDate
+                ? format(searchData.fromDate, 'MMM d')
+                : 'Any week'}{' '}
+              •{' '}
+              {searchData.adults > 0
+                ? `${searchData.adults} guests`
+                : 'Add guests'}
             </p>
           </div>
         </button>
       </div>
+
+      {/* Mobile Modal */}
+      {isMobileModalOpen && (
+        <div className="fixed inset-0 z-50 bg-white md:hidden">
+          <div className="flex h-full flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b p-4">
+              <button
+                onClick={() => setIsMobileModalOpen(false)}
+                className="rounded-full p-2 hover:bg-gray-100"
+              >
+                <X size={24} />
+              </button>
+              <span className="text-lg font-semibold">Search</span>
+              <div className="w-10" /> {/* Spacer for centering */}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {/* Where */}
+              <div className="mb-6">
+                <h3 className="mb-2 text-lg font-semibold">Where to?</h3>
+                <input
+                  type="text"
+                  value={searchData.destination}
+                  onChange={(e) =>
+                    setSearchData((prev) => ({
+                      ...prev,
+                      destination: e.target.value,
+                    }))
+                  }
+                  placeholder="Search destinations"
+                  className="w-full rounded-lg border border-gray-300 p-4 text-lg outline-none focus:border-gray-500"
+                />
+              </div>
+
+              {/* When */}
+              <div className="mb-6">
+                <h3 className="mb-2 text-lg font-semibold">When?</h3>
+                <div className="rounded-lg border border-gray-300 p-4">
+                  <DayPicker
+                    mode="single"
+                    selected={searchData.fromDate}
+                    onSelect={(date) =>
+                      setSearchData((prev) => ({
+                        ...prev,
+                        fromDate: date || undefined,
+                      }))
+                    }
+                    numberOfMonths={1}
+                    disabled={{ before: new Date() }}
+                    classNames={{
+                      months: 'flex gap-8',
+                      month: 'space-y-4 w-full',
+                      caption: 'flex justify-between items-center px-4 py-2',
+                      caption_label: 'text-base font-semibold',
+                      nav: 'flex items-center gap-2',
+                      table: 'w-full border-collapse space-y-1',
+                      head_row: 'flex',
+                      head_cell:
+                        'text-gray-500 font-medium w-10 h-10 flex items-center justify-center text-xs uppercase',
+                      row: 'flex w-full',
+                      cell: 'relative w-10 h-10 flex items-center justify-center',
+                      day: 'rounded-full w-9 h-9 text-sm font-normal transition hover:bg-gray-200',
+                      day_selected: 'bg-black text-white hover:bg-black',
+                      day_today: 'border border-gray-400',
+                      day_outside: 'text-gray-300',
+                      day_disabled: 'text-gray-300 line-through opacity-40',
+                      day_hidden: 'invisible',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Who */}
+              <div className="mb-6">
+                <h3 className="mb-2 text-lg font-semibold">Who's coming?</h3>
+                <div className="rounded-lg border border-gray-300 p-4">
+                  <GuestSelector
+                    adults={searchData.adults}
+                    onChange={(adults) =>
+                      setSearchData((prev) => ({ ...prev, adults }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t p-4">
+              <button
+                onClick={handleSearch}
+                className="bg-primary w-full rounded-lg py-4 text-center text-lg font-semibold text-white"
+                disabled={!searchData.destination}
+              >
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dropdowns */}
       <Dropdowns
@@ -164,7 +282,9 @@ const SectionButton = ({
       onClick={onClick}
       className={`${baseButtonStyle} ${className} ${
         isActive ? activeButtonStyle : hoverButtonStyle
-      } ${className.includes('rounded') ? '' : roundedStyle}`}
+      } ${className.includes('rounded') ? '' : roundedStyle} ${
+        isActive ? 'shadow-inner' : ''
+      }`}
     >
       {children}
     </Component>
@@ -181,19 +301,30 @@ const SearchField = ({
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
-}) => (
-  <div>
-    <label className="block text-xs font-semibold text-gray-800">{label}</label>
-    <input
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="mt-0.5 w-full border-none bg-transparent text-sm text-gray-600 placeholder-gray-600 outline-none"
-      onClick={(e) => e.stopPropagation()}
-    />
-  </div>
-);
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleDivClick = () => {
+    inputRef.current?.focus();
+  };
+
+  return (
+    <div onClick={handleDivClick} className="cursor-text">
+      <label className="block text-xs font-semibold text-gray-800">
+        {label}
+      </label>
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-0.5 w-full border-none bg-transparent text-sm text-gray-600 placeholder-gray-600 outline-none"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
+};
 
 const SearchDisplay = ({ label, value }: { label: string; value: string }) => (
   <div className="text-left">
