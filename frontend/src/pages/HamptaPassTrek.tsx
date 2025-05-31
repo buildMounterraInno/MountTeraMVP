@@ -14,6 +14,115 @@ const tabs = [
   'Safety Measures',
 ];
 
+const vendors = [
+  {
+    id: 1,
+    name: 'Adventure Himalaya',
+    logo: 'AH',
+    logoColor: 'bg-green-100 text-green-600',
+    verified: true,
+    rating: 4.8,
+    reviewCount: 245,
+    price: 12500,
+    originalPrice: 15000,
+    groupSize: '8-15 people',
+    startDate: 'June 15, 2024',
+    availableSlots: 12,
+    inclusions: ['Meals', 'Accommodation', 'Guide', 'Transport'],
+    additionalInclusions: 0,
+    highlights: [
+      { text: 'Professional Photography', color: 'bg-blue-100 text-blue-800' },
+      { text: 'Medical Kit', color: 'bg-green-100 text-green-800' },
+      { text: 'Experienced Guides', color: 'bg-purple-100 text-purple-800' },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Trek Himalaya',
+    logo: 'TH',
+    logoColor: 'bg-blue-100 text-blue-600',
+    verified: false,
+    rating: 4.6,
+    reviewCount: 132,
+    price: 11000,
+    originalPrice: null,
+    groupSize: '10-20 people',
+    startDate: 'June 20, 2024',
+    availableSlots: 8,
+    inclusions: ['Meals', 'Tents', 'Guide', 'Permits'],
+    additionalInclusions: 0,
+    highlights: [
+      {
+        text: 'Local Cultural Experience',
+        color: 'bg-orange-100 text-orange-800',
+      },
+      { text: 'Budget Friendly', color: 'bg-green-100 text-green-800' },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Mountain Explorers',
+    logo: 'ME',
+    logoColor: 'bg-orange-100 text-orange-600',
+    verified: true,
+    rating: 4.9,
+    reviewCount: 456,
+    price: 18500,
+    originalPrice: 22000,
+    groupSize: '6-12 people',
+    startDate: 'June 10, 2024',
+    availableSlots: 5,
+    inclusions: ['Meals', 'Luxury Tents', 'Guide', 'Transport'],
+    additionalInclusions: 0,
+    highlights: [
+      { text: 'Luxury Camping', color: 'bg-purple-100 text-purple-800' },
+      { text: 'Private Chef', color: 'bg-blue-100 text-blue-800' },
+      { text: 'Emergency Evacuation', color: 'bg-red-100 text-red-800' },
+      { text: 'Small Groups', color: 'bg-green-100 text-green-800' },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Himalayan Odyssey',
+    logo: 'HO',
+    logoColor: 'bg-purple-100 text-purple-600',
+    verified: false,
+    rating: 4.2,
+    reviewCount: 89,
+    price: 13800,
+    originalPrice: null,
+    groupSize: '12-25 people',
+    startDate: 'June 25, 2024',
+    availableSlots: 3,
+    inclusions: ['Meals', 'Accommodation', 'Guide', 'Insurance'],
+    additionalInclusions: 0,
+    highlights: [
+      { text: 'Eco-Friendly', color: 'bg-green-100 text-green-800' },
+      { text: 'Photography Focus', color: 'bg-blue-100 text-blue-800' },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Peak Adventures',
+    logo: 'PA',
+    logoColor: 'bg-red-100 text-red-600',
+    verified: false,
+    rating: 4.3,
+    reviewCount: 67,
+    price: 9500,
+    originalPrice: null,
+    groupSize: '15-30 people',
+    startDate: 'July 5, 2024',
+    availableSlots: 15,
+    inclusions: ['Meals', 'Basic Tents', 'Guide', 'Equipment'],
+    additionalInclusions: 0,
+    highlights: [
+      { text: 'Basic Package', color: 'bg-green-100 text-green-800' },
+      { text: 'Large Groups', color: 'bg-blue-100 text-blue-800' },
+    ],
+  },
+];
+
 const HamptaPassTrek = () => {
   const [activeTab, setActiveTab] = useState('Overview');
 
@@ -67,6 +176,29 @@ const HamptaPassTrek = () => {
     'Photography of pristine alpine lakes',
     'Experience of high-altitude camping',
   ];
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <span
+        key={i}
+        className={i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}
+      >
+        ★
+      </span>
+    ));
+  };
+
+  const getAvailabilityColor = (slots: number) => {
+    if (slots > 10) return 'text-green-600';
+    if (slots > 5) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getAvailabilityDotColor = (slots: number) => {
+    if (slots > 10) return 'bg-green-500';
+    if (slots > 5) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -169,23 +301,25 @@ const HamptaPassTrek = () => {
               {activeTab === 'Overview' && (
                 <div className="rounded-lg bg-white p-6">
                   <h3 className="text-xl font-semibold">About This Trek</h3>
-                  <p>
+                  <p className="mt-3 text-gray-600">
                     The Hampta Pass trek is one of the most popular and
                     rewarding treks in Himachal Pradesh. This moderate-level
                     trek offers an incredible diversity of landscapes – from the
                     lush green valleys of Kullu to the stark, desert-like
                     terrain of Lahaul and Spiti.
                   </p>
-                  <p>
+                  <p className="mt-3 text-gray-600">
                     The trek crosses the Hampta Pass at 14,100 feet, offering
                     views of the Pir Panjal and Dhauladhar ranges. A highlight
                     is the Chandratal Lake, often called the 'Moon Lake' for its
                     crescent shape.
                   </p>
                   <h4 className="mt-4 font-semibold">What to Expect:</h4>
-                  <ul className="list-inside list-disc space-y-1">
+                  <ul className="mt-2 space-y-1">
                     {whatToExpect.map((item, i) => (
-                      <li key={i}>✅ {item}</li>
+                      <li key={i} className="flex items-center text-gray-600">
+                        ✅ {item}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -194,7 +328,7 @@ const HamptaPassTrek = () => {
               {activeTab === 'Quick Facts' && (
                 <div className="rounded-lg bg-white p-6">
                   <h3 className="text-xl font-semibold">Quick Facts</h3>
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {quickFacts.map((fact, idx) => (
                       <div
                         key={idx}
@@ -218,7 +352,7 @@ const HamptaPassTrek = () => {
               {activeTab === 'How to Reach' && (
                 <div className="rounded-lg bg-white p-6">
                   <h3 className="text-xl font-semibold">How to Reach</h3>
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
                     {howToReach.map((item, i) => (
                       <div
                         key={i}
@@ -244,7 +378,7 @@ const HamptaPassTrek = () => {
               {activeTab === 'Trek Difficulty' && (
                 <div className="rounded-lg bg-white p-6">
                   <h3 className="text-xl font-semibold">Trek Difficulty</h3>
-                  <div className="space-y-4 rounded-lg bg-gray-50 p-6 shadow-md">
+                  <div className="mt-4 space-y-4 rounded-lg bg-gray-50 p-6 shadow-md">
                     <div>
                       <p className="font-medium text-gray-700">Trail Type:</p>
                       <p className="text-gray-600">
@@ -286,7 +420,7 @@ const HamptaPassTrek = () => {
               {activeTab === 'Safety Measures' && (
                 <div className="rounded-lg bg-white p-6">
                   <h3 className="text-xl font-semibold">Safety Measures</h3>
-                  <div className="grid gap-6 md:grid-cols-2">
+                  <div className="mt-4 grid gap-6 md:grid-cols-2">
                     <div className="space-y-3">
                       <h4 className="font-medium text-gray-700">
                         Acclimatization
@@ -303,26 +437,147 @@ const HamptaPassTrek = () => {
                           3-layer clothing system (thermal, fleece, shell)
                         </li>
                         <li>Good trekking shoes, waterproof jacket</li>
-                        <li>
-                          Carry ORS, Diamox, painkillers, and altitude meds
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-gray-700">
-                        Guides & Signals
-                      </h4>
-                      <ul className="list-inside list-disc text-gray-600">
-                        <li>Always trek with certified guides</li>
-                        <li>Carry a whistle and torch, stay with group</li>
-                        <li>
-                          Mobile signals vanish after Jobra, rely on guides
-                        </li>
+                        <li>Headlamp, first aid kit, water purification</li>
                       </ul>
                     </div>
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Available Vendors Section */}
+          <div className="mt-10 rounded-xl bg-white p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Available Packages (5 vendors)
+              </h2>
+              <p className="mt-2 text-gray-600">
+                Choose from verified trekking companies offering Hampta Pass
+                packages
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {vendors.map((vendor) => (
+                <div
+                  key={vendor.id}
+                  className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex-1">
+                      <div className="mb-3 flex items-center gap-3">
+                        <div
+                          className={`h-12 w-12 ${vendor.logoColor} flex items-center justify-center rounded-lg`}
+                        >
+                          <span className="text-xl font-bold">
+                            {vendor.logo}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                            {vendor.name}
+                            {vendor.verified && (
+                              <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                                Verified
+                              </span>
+                            )}
+                          </h3>
+                          <div className="flex items-center gap-1">
+                            <div className="flex">
+                              {renderStars(vendor.rating)}
+                            </div>
+                            <span className="text-sm text-gray-600">
+                              {vendor.rating} ({vendor.reviewCount} reviews)
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div>
+                          <h4 className="mb-2 font-medium text-gray-700">
+                            Inclusions:
+                          </h4>
+                          <ul className="space-y-1 text-sm text-gray-600">
+                            {vendor.inclusions.map((inclusion, idx) => (
+                              <li key={idx} className="flex items-center gap-2">
+                                <span className="text-green-500">✓</span>
+                                {inclusion}
+                              </li>
+                            ))}
+                            {vendor.additionalInclusions > 0 && (
+                              <li className="text-xs text-blue-600">
+                                +{vendor.additionalInclusions} more
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                        <div>
+                          <div className="mb-2 flex items-center gap-2">
+                            <span className="text-gray-500">👥</span>
+                            <span className="text-sm text-gray-600">
+                              {vendor.groupSize}
+                            </span>
+                          </div>
+                          <div className="mb-2 flex items-center gap-2">
+                            <span className="text-gray-500">📅</span>
+                            <span className="text-sm text-gray-600">
+                              Starts {vendor.startDate}
+                            </span>
+                          </div>
+                          <div className="mb-3 flex items-center gap-2">
+                            <span
+                              className={`h-2 w-2 ${getAvailabilityDotColor(vendor.availableSlots)} rounded-full`}
+                            ></span>
+                            <span
+                              className={`text-sm ${getAvailabilityColor(vendor.availableSlots)}`}
+                            >
+                              {vendor.availableSlots} slots available
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {vendor.highlights.map((highlight, idx) => (
+                              <span
+                                key={idx}
+                                className={`rounded-full ${highlight.color} px-2 py-1 text-xs`}
+                              >
+                                {highlight.text}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-3 lg:ml-6">
+                      <div className="text-right">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold text-gray-900">
+                            ₹{vendor.price.toLocaleString()}
+                          </span>
+                          {vendor.originalPrice && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹{vendor.originalPrice.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          per person
+                        </span>
+                      </div>
+                      <div className="flex justify-end">
+                        {/* <button className="rounded-lg border border-blue-200 px-4 py-2 text-blue-600 transition-colors hover:bg-blue-50">
+                          Details
+                        </button> */}
+                        <button className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700">
+                          Book Now
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
