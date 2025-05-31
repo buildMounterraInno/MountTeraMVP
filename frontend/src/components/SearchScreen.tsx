@@ -1,45 +1,36 @@
-import backgroundImage from "../assets/Background.jpg"
-import SearchBar from "./common/SearchBar";
+import backgroundImage from '../assets/Background.jpg';
+import SearchBar from './common/SearchBar';
 
 function SearchScreen() {
   return (
-    <div className="relative h-[94vh] w-full overflow-hidden">
+    <section className="relative h-[94vh] w-full overflow-visible">
+      {/* Background with overlay */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-        }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
       >
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* Content container */}
-      <div className="relative flex h-full items-center justify-center px-4">
-        <div className="text-center">
-          <h1 className="font-tpc mb-2 text-4xl font-[600] text-white drop-shadow-lg md:text-5xl lg:text-6xl">
+      {/* Content */}
+      <div className="flex h-full items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-4xl text-center">
+          <h1 className="font-tpc mb-4 text-4xl leading-tight font-semibold text-white drop-shadow-lg sm:text-5xl md:text-6xl lg:text-7xl">
             Choose Your Next
-          </h1>
-          <h1 className="font-tpc mb-2 text-4xl font-[600] text-white drop-shadow-lg md:text-5xl lg:text-6xl">
+            <br />
             Adventure
           </h1>
-          <p className="font-tpc mb-8 text-base text-white drop-shadow-md md:text-lg">
+          <p className="font-tpc mb-8 text-base text-white/90 drop-shadow-md sm:text-lg md:text-xl">
             Journeys start where comfort ends
           </p>
 
-          {/* Search component */}
-          <div className="mx-auto max-w-md">
-            <div className="relative flex items-center">
-              {/* HERE!!!!!!!! */}
-              <SearchBar />
-            </div>
+          <div className="relative mx-auto max-w-2xl">
+            <SearchBar />
           </div>
         </div>
       </div>
-    </div>
-  )
+    </section>
+  );
 }
 
-export default SearchScreen
+export default SearchScreen;

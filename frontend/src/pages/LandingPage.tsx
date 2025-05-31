@@ -4,11 +4,11 @@ import Misc from '../components/Misc';
 
 const LandingPage = () => {
   return (
-    <div className="">
+    <main className="">
       <SearchScreen />
       <CategoryTabs />
       <Misc />
-    </div>
+    </main>
   );
 };
 

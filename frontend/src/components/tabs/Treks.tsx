@@ -1,4 +1,5 @@
 import { type Trek, treks } from '../../data/trek.ts';
+import { Link } from 'react-router-dom';
 
 const TrekTile: React.FC<Trek> = ({
   destinationImage,
@@ -7,25 +8,27 @@ const TrekTile: React.FC<Trek> = ({
   coordinates,
 }) => {
   return (
-    <article
-      className="relative h-50 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-shadow hover:shadow-lg"
-      style={{ backgroundImage: `url(${destinationImage})` }}
-      aria-labelledby={`trek-title-${placeName}`}
-    >
-      {/* Overlay for gradient */}
-      <div className="to-[#D9D9D9]-200/10 absolute inset-0 z-0 bg-gradient-to-t from-black/40"></div>
+    <Link to="/pages/HamptaPassTrek" className="block">
+      <article
+        className="relative h-50 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:ring-2 hover:ring-[#F2F2F2]/50"
+        style={{ backgroundImage: `url(${destinationImage})` }}
+        aria-labelledby={`trek-title-${placeName}`}
+      >
+        {/* Overlay for gradient */}
+        <div className="to-[#D9D9D9]-200/10 absolute inset-0 z-0 bg-gradient-to-t from-black/40 transition-opacity duration-300 hover:from-black/50"></div>
 
-      <div className="absolute bottom-3 left-3 z-10">
-        <h3
-          id={`trek-title-${placeName}`}
-          className="text-lg font-semibold text-white"
-        >
-          {placeName}
-        </h3>
-        <p className="text-sm text-white/90">{state}</p>
-        <p className="text-sm text-white/80">{coordinates}</p>
-      </div>
-    </article>
+        <div className="absolute bottom-3 left-3 z-10">
+          <h3
+            id={`trek-title-${placeName}`}
+            className="text-lg font-semibold text-white"
+          >
+            {placeName}
+          </h3>
+          <p className="text-sm text-white/90">{state}</p>
+          <p className="text-sm text-white/80">{coordinates}</p>
+        </div>
+      </article>
+    </Link>
   );
 };
 

@@ -4,13 +4,14 @@ import Footer from './common/Footer';
 
 function MainLayout() {
   return (
-    <div>
-      {/* Navbar */}
+    <div className="flex min-h-screen flex-col">
       <Navbar />
-      {/* Path rendered Pages */}
-      <Outlet />
-      {/* Sherpa AI - WIP */}
-      {/* Footer */}
+
+      {/* Main content area - Flexible height */}
+      <main className="w-full flex-grow">
+        <Outlet />
+      </main>
+
       <Footer />
     </div>
   );

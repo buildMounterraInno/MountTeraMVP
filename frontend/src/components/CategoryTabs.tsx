@@ -5,18 +5,23 @@ import Events from './tabs/Events';
 
 type CategoryId = 'Treks' | 'Experience' | 'Events';
 
+interface Category {
+  id: CategoryId;
+  label: string;
+}
+
+const categories: Category[] = [
+  { id: 'Treks', label: 'Treks' },
+  { id: 'Experience', label: 'Experience' },
+  { id: 'Events', label: 'Events' },
+];
+
 export default function CategoryTabs() {
   const [activeTab, setActiveTab] = useState<CategoryId>('Treks');
 
-  const categories: { id: CategoryId; label: string }[] = [
-    { id: 'Treks', label: 'Treks' },
-    { id: 'Experience', label: 'Experience' },
-    { id: 'Events', label: 'Events' },
-  ];
-
   return (
-    <div className="w-full bg-[#F2F2F2]">
-      {/* Tabs Container */}
+    <section className="w-full bg-[#F2F2F2]">
+      {/* Tabs - Restored original positioning */}
       <div className="flex -translate-y-12 justify-around sm:px-4">
         {categories.map((category) => (
           <button
@@ -25,19 +30,21 @@ export default function CategoryTabs() {
               activeTab === category.id
                 ? 'bg-[#F2F2F2] text-black'
                 : 'text-white'
-            }`}
+            } `}
             onClick={() => setActiveTab(category.id)}
+            aria-pressed={activeTab === category.id}
           >
             {category.label}
           </button>
         ))}
       </div>
+
       {/* Content */}
       <div className="px-4 pb-8 sm:px-8">
         {activeTab === 'Treks' && <Treks />}
         {activeTab === 'Experience' && <Experience />}
         {activeTab === 'Events' && <Events />}
       </div>
-    </div>
+    </section>
   );
 }
