@@ -2,6 +2,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
 import LandingPage from './pages/LandingPage';
 import HamptaPassTrek from './pages/HamptaPassTrek';
+import KedarkanthaTrek from './pages/KedarkanthaTrek';
+import ValleyOfFlowersTrek from './pages/ValleyOfFlowersTrek';
+import KashmirGreatLakesTrek from './pages/KashmirGreatLakesTrek';
+import ChadarTrek from './pages/ChadarTrek';
+import RoopkundTrek from './pages/RoopkundTrek';
 
 function App() {
   return (
@@ -10,6 +15,17 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/pages/HamptaPassTrek" element={<HamptaPassTrek />} />
+          <Route path="/pages/KedarkanthaTrek" element={<KedarkanthaTrek />} />
+          <Route
+            path="/pages/ValleyOfFlowersTrek"
+            element={<ValleyOfFlowersTrek />}
+          />
+          <Route
+            path="/pages/KashmirGreatLakesTrek"
+            element={<KashmirGreatLakesTrek />}
+          />
+          <Route path="/pages/ChadarTrek" element={<ChadarTrek />} />
+          <Route path="/pages/RoopkundTrek" element={<RoopkundTrek />} />
         </Route>
       </Routes>
     </BrowserRouter>

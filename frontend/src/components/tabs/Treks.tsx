@@ -8,7 +8,7 @@ const TrekTile: React.FC<Trek> = ({
   coordinates,
 }) => {
   return (
-    <Link to="/pages/HamptaPassTrek" className="block">
+    <Link to="/pages/RoopkundTrek" className="block">
       <article
         className="relative h-50 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:ring-2 hover:ring-[#F2F2F2]/50"
         style={{ backgroundImage: `url(${destinationImage})` }}
