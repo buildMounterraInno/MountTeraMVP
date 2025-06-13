@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { treks } from '../data/trek';
 import SearchBar from '../components/common/SearchBar';
 
-// Get the trek data
 const trekData = treks.find((trek) => trek.placeName === 'Chadar Trek');
 
 const images = [
@@ -228,7 +227,7 @@ const ChadarTrek = () => {
             <SearchBar />
           </div>
 
-          {/* Hero Section with white text */}
+          {/* Hero Section */}
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="md:w-1/2">
               <div className="overflow-hidden rounded-2xl shadow-lg">
@@ -287,7 +286,7 @@ const ChadarTrek = () => {
             </div>
           </div>
 
-          {/* Tabs Section with white background */}
+          {/* Tabs Section */}
           <div className="mt-10 rounded-xl bg-white p-4">
             <div className="flex space-x-6">
               {tabs.map((tab) => (
