@@ -14,23 +14,24 @@ interface VideoReelCarouselProps {
 const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [reelWidth, setReelWidth] = useState(0);
-  const visibleCount = 6; // how many visible at once (match your width calc)
+  const [containerWidth, setContainerWidth] = useState(0);
 
-  // Set reel width on mount & resize
   useEffect(() => {
-    const calculateWidth = () => {
+    const calculateWidths = () => {
       if (scrollContainerRef.current) {
         const child = scrollContainerRef.current.children[0] as HTMLElement;
-        const width = child.getBoundingClientRect().width + 16; // 16px gap
+        const width = child.getBoundingClientRect().width + 16; // 16px for gap
         setReelWidth(width);
+        setContainerWidth(
+          scrollContainerRef.current.getBoundingClientRect().width
+        );
       }
     };
-    calculateWidth();
-    window.addEventListener('resize', calculateWidth);
-    return () => window.removeEventListener('resize', calculateWidth);
+    calculateWidths();
+    window.addEventListener('resize', calculateWidths);
+    return () => window.removeEventListener('resize', calculateWidths);
   }, []);
 
-  // Button controlled scroll
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
@@ -39,7 +40,7 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
   };
 
   return (
-    <div className="flex w-full justify-center">
+    <div className="mx-auto w-full max-w-[1920px]">
       <div className="flex items-center gap-2">
         <button
           onClick={() => scroll('left')}
@@ -56,13 +57,15 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             scrollBehavior: 'smooth',
-            width: `calc(250px * ${visibleCount} + 16px * ${visibleCount - 1})`,
+            width: '100%',
+            maxWidth: 'calc(100% - 80px)', // Account for navigation buttons
           }}
         >
           {reels.map((reel, index) => (
             <div
               key={`${reel.videoPath}-${index}`}
               className="flex-shrink-0 snap-start"
+              style={{ width: '250px' }} // Explicitly set width to match VideoReel component
             >
               <VideoReel {...reel} />
             </div>
