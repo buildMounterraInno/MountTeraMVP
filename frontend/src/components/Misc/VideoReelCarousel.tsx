@@ -14,7 +14,7 @@ interface VideoReelCarouselProps {
 const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [reelWidth, setReelWidth] = useState(0);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [setContainerWidth] = useState(0);
 
   useEffect(() => {
     const calculateWidths = () => {
