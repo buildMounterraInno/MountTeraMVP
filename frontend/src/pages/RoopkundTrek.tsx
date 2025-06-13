@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { treks } from '../data/trek';
 import SearchBar from '../components/common/SearchBar';
+import VideoReelCarousel from '../components/Misc/VideoReelCarousel';
 
 // Get the trek data
 const trekData = treks.find((trek) => trek.placeName === 'Roopkund Trek');
@@ -129,6 +130,25 @@ const vendors = [
       { text: 'Basic Package', color: 'bg-green-100 text-green-800' },
       { text: 'Flexible Dates', color: 'bg-blue-100 text-blue-800' },
     ],
+  },
+];
+
+const videoReels = [
+  {
+    videoPath: '/videos/reel1.mp4',
+    title: 'Mystery Lake',
+  },
+  {
+    videoPath: '/videos/reel1.mp4',
+    title: 'Alpine Meadows',
+  },
+  {
+    videoPath: '/videos/reel1.mp4',
+    title: 'Snow Views',
+  },
+  {
+    videoPath: '/videos/reel1.mp4',
+    title: 'Trek Experience',
   },
 ];
 
@@ -462,6 +482,17 @@ const RoopkundTrek = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Video Reels Section */}
+          <div className="mt-10 rounded-xl bg-white p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Trek Videos</h2>
+              <p className="mt-2 text-gray-600">
+                Experience the Roopkund Trek through these amazing video reels
+              </p>
+            </div>
+            <VideoReelCarousel reels={videoReels} />
           </div>
 
           {/* Available Vendors Section */}
