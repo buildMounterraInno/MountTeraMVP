@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Treks from './tabs/Treks';
-import Experience from './tabs/Experience';
+import ExperienceSection from './tabs/Experience';
 import Events from './tabs/Events';
 
 type CategoryId = 'Treks' | 'Experience' | 'Events';
@@ -42,7 +42,7 @@ export default function CategoryTabs() {
       {/* Content */}
       <div className="px-4 pb-8 sm:px-8">
         {activeTab === 'Treks' && <Treks />}
-        {activeTab === 'Experience' && <Experience />}
+        {activeTab === 'Experience' && <ExperienceSection />}
         {activeTab === 'Events' && <Events />}
       </div>
     </section>
