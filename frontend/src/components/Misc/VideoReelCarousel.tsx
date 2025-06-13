@@ -14,19 +14,22 @@ interface VideoReelCarouselProps {
 const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [reelWidth, setReelWidth] = useState(0);
-  const visibleCount = 6;
+  const [containerWidth, setContainerWidth] = useState(0);
 
   useEffect(() => {
-    const calculateWidth = () => {
+    const calculateWidths = () => {
       if (scrollContainerRef.current) {
         const child = scrollContainerRef.current.children[0] as HTMLElement;
-        const width = child.getBoundingClientRect().width + 16;
+        const width = child.getBoundingClientRect().width + 16; // 16px for gap
         setReelWidth(width);
+        setContainerWidth(
+          scrollContainerRef.current.getBoundingClientRect().width
+        );
       }
     };
-    calculateWidth();
-    window.addEventListener('resize', calculateWidth);
-    return () => window.removeEventListener('resize', calculateWidth);
+    calculateWidths();
+    window.addEventListener('resize', calculateWidths);
+    return () => window.removeEventListener('resize', calculateWidths);
   }, []);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -55,12 +58,14 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
             msOverflowStyle: 'none',
             scrollBehavior: 'smooth',
             width: '100%',
+            maxWidth: 'calc(100% - 80px)', // Account for navigation buttons
           }}
         >
           {reels.map((reel, index) => (
             <div
               key={`${reel.videoPath}-${index}`}
               className="flex-shrink-0 snap-start"
+              style={{ width: '250px' }} // Explicitly set width to match VideoReel component
             >
               <VideoReel {...reel} />
             </div>
