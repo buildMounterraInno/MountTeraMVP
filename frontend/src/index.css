@@ -3,6 +3,7 @@
 @theme {
   /* Colors */
   --color-primary: oklch(0.55 0.2215 262.25);
+  --color-luxury: oklch(0.1408 0.0044 285.82);
 
   /* Fonts */
   --font-tpc: 'Montserrat', sans-serif;

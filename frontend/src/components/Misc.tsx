@@ -1,20 +1,21 @@
-import facebookIcon from '../assets/icons/socialMedia/facebook.svg';
-import instagramIcon from '../assets/icons/socialMedia/instagram.svg';
-import linkedInIcon from '../assets/icons/socialMedia/linkedin.svg';
-import SocialProfiles from './Misc/SocialProfiles';
+import VideoReelCarousel from './Misc/VideoReelCarousel';
 
-const socialLinks = [
-  { icon: instagramIcon, alt: 'Instagram', href: '#' },
-  { icon: facebookIcon, alt: 'Facebook', href: '#' },
-  { icon: linkedInIcon, alt: 'LinkedIn', href: '#' },
+// Sample video reels data - replace with your actual video paths
+const sampleReels = [
+  { videoPath: '/videos/reel1.mp4', title: 'Mountain Adventure' },
+  { videoPath: '/videos/reel1.mp4', title: 'Beach Sunset' },
+  { videoPath: '/videos/reel1.mp4', title: 'City Exploration' },
+  { videoPath: '/videos/reel1.mp4', title: 'Forest Trek' },
+  { videoPath: '/videos/reel1.mp4', title: 'Desert Safari' },
+  { videoPath: '/videos/reel1.mp4', title: 'Waterfall Visit' },
 ];
 
 const Misc = () => {
   return (
-    <section className="relative flex flex-col gap-4 bg-[#F2F2F2] px-8 pb-6">
+    <section className="relative flex flex-col gap-6 bg-[#F2F2F2] px-4 py-8 sm:px-8">
       {/* Title */}
       <h2 className="font-tpc text-2xl font-semibold text-[#FD5700] sm:text-3xl">
-        Ready for your next journey ?
+        Ready for your next journey?
       </h2>
 
       {/* Phrase */}
@@ -24,22 +25,10 @@ const Misc = () => {
         featured!
       </p>
 
-      {/* Social Media Icons */}
-      <div className="flex gap-4">
-        {socialLinks.map(({ icon, alt, href }) => (
-          <a
-            key={alt}
-            href={href}
-            className="transition-transform hover:scale-110"
-            aria-label={alt}
-          >
-            <img src={icon} alt={alt} className="h-6 w-6" />
-          </a>
-        ))}
+      {/* Video Reels Carousel */}
+      <div className="w-full">
+        <VideoReelCarousel reels={sampleReels} />
       </div>
-
-      {/* Featured Profiles */}
-      <SocialProfiles />
     </section>
   );
 };

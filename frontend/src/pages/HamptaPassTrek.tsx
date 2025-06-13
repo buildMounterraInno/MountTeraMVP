@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { treks } from '../data/trek';
 import SearchBar from '../components/common/SearchBar';
 
-// Get the trek data
 const trekData = treks.find((trek) => trek.placeName === 'Hampta Pass Trek');
 
 const images = [
