@@ -29,7 +29,7 @@ const ExperienceTile: React.FC<Experience> = ({
   );
 };
 
-const Experience = () => {
+const ExperienceSection = () => {
   const displayedTreks = experiences.slice(0, 6);
 
   return (
@@ -46,4 +46,4 @@ const Experience = () => {
   );
 };
 
-export default Experience;
+export default ExperienceSection;

@@ -1,5 +1,3 @@
-import googlePlay from '../../assets/icons/StoreIcons/googlePlay.png';
-import appStoreBlack from '../../assets/icons/StoreIcons/appStoreBlack.svg';
 import footerDecal from '../../assets/footerDecal.svg';
 
 const Footer = () => {
