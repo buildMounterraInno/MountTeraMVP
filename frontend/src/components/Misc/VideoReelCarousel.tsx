@@ -14,7 +14,6 @@ interface VideoReelCarouselProps {
 const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [reelWidth, setReelWidth] = useState(0);
-  const [setContainerWidth] = useState(0);
 
   useEffect(() => {
     const calculateWidths = () => {
@@ -22,9 +21,6 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
         const child = scrollContainerRef.current.children[0] as HTMLElement;
         const width = child.getBoundingClientRect().width + 16; // 16px for gap
         setReelWidth(width);
-        setContainerWidth(
-          scrollContainerRef.current.getBoundingClientRect().width
-        );
       }
     };
     calculateWidths();
@@ -34,9 +30,11 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
     const scrollAmount = direction === 'left' ? -reelWidth : reelWidth;
-    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    scrollContainerRef.current.scrollBy({
+      left: scrollAmount,
+      behavior: 'smooth',
+    });
   };
 
   return (
@@ -65,7 +63,7 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
             <div
               key={`${reel.videoPath}-${index}`}
               className="flex-shrink-0 snap-start"
-              style={{ width: '250px' }} // Explicitly set width to match VideoReel component
+              style={{ width: '250px' }}
             >
               <VideoReel {...reel} />
             </div>
