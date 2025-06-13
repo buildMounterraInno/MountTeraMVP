@@ -14,14 +14,13 @@ interface VideoReelCarouselProps {
 const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [reelWidth, setReelWidth] = useState(0);
-  const visibleCount = 6; // how many visible at once (match your width calc)
+  const visibleCount = 6;
 
-  // Set reel width on mount & resize
   useEffect(() => {
     const calculateWidth = () => {
       if (scrollContainerRef.current) {
         const child = scrollContainerRef.current.children[0] as HTMLElement;
-        const width = child.getBoundingClientRect().width + 16; // 16px gap
+        const width = child.getBoundingClientRect().width + 16;
         setReelWidth(width);
       }
     };
@@ -30,7 +29,6 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
     return () => window.removeEventListener('resize', calculateWidth);
   }, []);
 
-  // Button controlled scroll
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
@@ -39,7 +37,7 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
   };
 
   return (
-    <div className="flex w-full justify-center">
+    <div className="mx-auto w-full max-w-[1920px]">
       <div className="flex items-center gap-2">
         <button
           onClick={() => scroll('left')}
@@ -56,7 +54,7 @@ const VideoReelCarousel: React.FC<VideoReelCarouselProps> = ({ reels }) => {
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             scrollBehavior: 'smooth',
-            width: `calc(250px * ${visibleCount} + 16px * ${visibleCount - 1})`,
+            width: '100%',
           }}
         >
           {reels.map((reel, index) => (
