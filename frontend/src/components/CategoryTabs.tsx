@@ -11,7 +11,7 @@ interface Category {
 }
 
 const categories: Category[] = [
-  { id: 'Treks', label: 'Treks' },
+  { id: 'Treks', label: 'Adventures' },
   { id: 'Experience', label: 'Experience' },
   { id: 'Events', label: 'Events' },
 ];
