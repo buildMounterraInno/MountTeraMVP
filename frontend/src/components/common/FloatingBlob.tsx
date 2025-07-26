@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+
+// Not being used now but anytime - so pls don't delete this shit. Can't code again
 const FloatingBlob = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -43,7 +45,7 @@ const FloatingBlob = () => {
           }}
         />
         
-        {/* AI Symbol in center */}
+       
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-white text-6xl font-bold drop-shadow-lg">
             🤖

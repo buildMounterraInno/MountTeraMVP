@@ -1,5 +1,7 @@
 import backgroundImage from '../assets/Background.jpg';
 
+
+// To be kept as static page for now lol
 const SherpaAI = () => {
   return (
     <main className="relative min-h-screen w-full overflow-visible">

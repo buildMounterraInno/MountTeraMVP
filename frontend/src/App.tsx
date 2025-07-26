@@ -10,6 +10,9 @@ import RoopkundTrek from './pages/RoopkundTrek';
 import SearchResults from './pages/SearchResults';
 import SherpaAI from './pages/SherpaAI';
 
+
+// App Currently Deployed on two space. One is the OG vercel - get it from uploading from github
+// Second is the tpc-dev link on Gyani's vercel - ask me
 function App() {
   return (
     <BrowserRouter>
