@@ -1,17 +1,18 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, Children, isValidElement } from 'react';
 import { Search, Plus, Minus, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-type SearchSection = 'where' | 'from' | 'who' | null;
+type SearchSection = 'where' | 'date' | 'who' | null;
+type SearchType = 'events-experiences' | 'adventures';
 
 interface SearchData {
   destination: string;
   fromDate?: Date;
   adults: number;
+  searchType: SearchType;
 }
 
 const baseButtonStyle = 'relative cursor-pointer transition-all';
@@ -26,6 +27,7 @@ const SearchBar = () => {
     destination: '',
     fromDate: undefined,
     adults: 0,
+    searchType: 'events-experiences',
   });
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -50,32 +52,100 @@ const SearchBar = () => {
       searchParams.set('destination', searchData.destination);
     }
     if (searchData.fromDate) {
-      searchParams.set('date', format(searchData.fromDate, 'yyyy-MM-dd'));
+      searchParams.set('fromDate', format(searchData.fromDate, 'yyyy-MM-dd'));
     }
     if (searchData.adults > 0) {
       searchParams.set('adults', searchData.adults.toString());
     }
+    searchParams.set('type', searchData.searchType);
     setIsMobileModalOpen(false);
     navigate(`/search?${searchParams.toString()}`);
   }, [searchData, navigate]);
+
+  // Function to scroll search bar to optimal position for calendar visibility
+  const scrollToCenter = useCallback(() => {
+    if (searchRef.current) {
+      const element = searchRef.current;
+      const elementRect = element.getBoundingClientRect();
+      const absoluteElementTop = elementRect.top + window.pageYOffset;
+      
+      // Calendar needs about 400px height, position search bar to leave enough space
+      const calendarHeight = 400;
+      const bufferSpace = 50;
+      const requiredSpaceBelow = calendarHeight + bufferSpace;
+      
+      // Position search bar so there's adequate space below for calendar
+      const idealTop = window.innerHeight - requiredSpaceBelow - elementRect.height;
+      const targetPosition = absoluteElementTop - Math.max(idealTop, window.innerHeight / 4);
+      
+      window.scrollTo({
+        top: Math.max(0, targetPosition),
+        behavior: 'smooth'
+      });
+    }
+  }, []);
+
+  // Handle section activation with scroll
+  const handleSectionClick = useCallback((section: SearchSection) => {
+    setActiveSection(section);
+    if (section === 'date') {
+      // Delay to ensure the section is set and calendar is rendered before scrolling
+      setTimeout(() => {
+        scrollToCenter();
+      }, 100);
+    }
+  }, [scrollToCenter]);
+
+  const getPlaceholderText = () => {
+    return searchData.searchType === 'adventures' 
+      ? 'Search Adventures' 
+      : 'Search Events & Experiences';
+  };
 
   return (
     <div
       ref={searchRef}
       className="relative mx-auto w-full max-w-[850px] px-4 sm:px-6"
     >
+      {/* Search Type Toggle Buttons */}
+      <div className="mb-4 flex justify-start">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setSearchData(prev => ({ ...prev, searchType: 'events-experiences' }))}
+            className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${
+              searchData.searchType === 'events-experiences'
+                ? 'bg-[#1E63EF] text-white shadow-md'
+                : 'bg-[#F2F2F2] text-gray-600 hover:text-gray-800'
+            }`}
+            style={{ borderRadius: '30px', marginLeft: '20px' }}
+          >
+            Events & Experiences
+          </button>
+          <button
+            onClick={() => setSearchData(prev => ({ ...prev, searchType: 'adventures' }))}
+            className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${
+              searchData.searchType === 'adventures'
+                ? 'bg-[#1E63EF] text-white shadow-md'
+                : 'bg-[#F2F2F2] text-gray-600 hover:text-gray-800'
+            }`}
+            style={{ borderRadius: '30px' }}
+          >
+            Adventures
+          </button>
+        </div>
+      </div>
       {/* Desktop Search Bar */}
       <div className="hidden items-center rounded-full bg-white shadow-md transition-shadow hover:shadow-lg md:flex">
         {/* Where */}
         <SectionButton
           isActive={activeSection === 'where'}
           className="mr-2 flex-grow px-7 py-3 text-left"
-          onClick={() => setActiveSection('where')}
+          onClick={() => handleSectionClick('where')}
         >
           <SearchField
             label="Where"
             value={searchData.destination}
-            placeholder="Search destinations"
+            placeholder={getPlaceholderText()}
             onChange={(value) =>
               setSearchData((prev) => ({ ...prev, destination: value }))
             }
@@ -84,11 +154,11 @@ const SearchBar = () => {
 
         <Divider />
 
-        {/* From Date */}
+        {/* Date Range */}
         <SectionButton
-          isActive={activeSection === 'from'}
+          isActive={activeSection === 'date'}
           className="mx-2 px-6 py-3"
-          onClick={() => setActiveSection('from')}
+          onClick={() => handleSectionClick('date')}
         >
           <SearchDisplay
             label="From"
@@ -106,7 +176,7 @@ const SearchBar = () => {
         <SectionButton
           isActive={activeSection === 'who'}
           className="ml-2 flex items-center gap-3 rounded-r-full py-3 pr-2 pl-6"
-          onClick={() => setActiveSection('who')}
+          onClick={() => handleSectionClick('who')}
         >
           <SearchDisplay
             label="Who"
@@ -133,7 +203,7 @@ const SearchBar = () => {
               {searchData.destination || 'Anywhere'} •{' '}
               {searchData.fromDate
                 ? format(searchData.fromDate, 'MMM d')
-                : 'Any week'}{' '}
+                : 'Any date'}{' '}
               •{' '}
               {searchData.adults > 0
                 ? `${searchData.adults} guests`
@@ -173,8 +243,8 @@ const SearchBar = () => {
                       destination: e.target.value,
                     }))
                   }
-                  placeholder="Search destinations"
-                  className="w-full rounded-lg border border-gray-300 p-4 text-lg outline-none focus:border-gray-500"
+                  placeholder={getPlaceholderText()}
+                  className="w-full rounded-lg border border-gray-300 p-4 text-lg outline-none focus:border-gray-500 transition-all duration-300"
                 />
               </div>
 
@@ -234,7 +304,7 @@ const SearchBar = () => {
             <div className="border-t p-4">
               <button
                 onClick={handleSearch}
-                className="bg-primary w-full rounded-lg py-4 text-center text-lg font-semibold text-white"
+                className="bg-[#1E63EF] w-full rounded-lg py-4 text-center text-lg font-semibold text-white"
                 disabled={!searchData.destination}
               >
                 Search
@@ -248,8 +318,11 @@ const SearchBar = () => {
       <Dropdowns
         activeSection={activeSection}
         searchData={searchData}
-        onDateSelect={(fromDate) =>
-          setSearchData((prev) => ({ ...prev, fromDate }))
+        onDateSelect={(date) =>
+          setSearchData((prev) => ({ 
+            ...prev, 
+            fromDate: date || undefined
+          }))
         }
         onGuestChange={(adults) =>
           setSearchData((prev) => ({ ...prev, adults }))
@@ -271,8 +344,8 @@ const SectionButton = ({
   className?: string;
 }) => {
   // Check if children contains a button
-  const containsButton = React.Children.toArray(children).some(
-    (child) => React.isValidElement(child) && child.type === SearchButton
+  const containsButton = Children.toArray(children).some(
+    (child) => isValidElement(child) && child.type === SearchButton
   );
 
   const Component = containsButton ? 'div' : 'button';
@@ -319,7 +392,7 @@ const SearchField = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="mt-0.5 w-full border-none bg-transparent text-sm text-gray-600 placeholder-gray-600 outline-none"
+        className="mt-0.5 w-full border-none bg-transparent text-sm text-gray-600 placeholder-gray-600 outline-none transition-all duration-300"
         onClick={(e) => e.stopPropagation()}
       />
     </div>
@@ -346,7 +419,7 @@ const SearchButton = ({ onClick }: { onClick: () => void }) => {
         e.stopPropagation();
         onClick();
       }}
-      className="bg-primary flex h-12 w-12 items-center justify-center rounded-full text-white transition-all hover:bg-[#E31E56]"
+      className="bg-[#1E63EF] flex h-12 w-12 items-center justify-center rounded-full text-white transition-all hover:bg-[#E31E56]"
     >
       {buttonContent}
     </button>
@@ -366,14 +439,13 @@ const Dropdowns = ({
   onDateSelect: (date: Date | undefined) => void;
   onGuestChange: (adults: number) => void;
 }) => {
-  const isDatePickerOpen = activeSection === 'from';
+  const isDatePickerOpen = activeSection === 'date';
 
   return (
     <>
       {isDatePickerOpen && (
-        <div className="absolute z-10 mt-2 translate-x-25 rounded-[32px] bg-white p-4 shadow-xl">
+        <div className="absolute z-50 mt-4 left-1/2 transform -translate-x-1/2 rounded-[32px] bg-white p-6 shadow-2xl border border-gray-100 min-w-[350px] max-w-[90vw]">
           <DayPicker
-            animate
             mode="single"
             selected={searchData.fromDate}
             onSelect={onDateSelect}

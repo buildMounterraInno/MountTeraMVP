@@ -8,6 +8,7 @@ import KashmirGreatLakesTrek from './pages/KashmirGreatLakesTrek';
 import ChadarTrek from './pages/ChadarTrek';
 import RoopkundTrek from './pages/RoopkundTrek';
 import SearchResults from './pages/SearchResults';
+import SherpaAI from './pages/SherpaAI';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/sherpa-ai" element={<SherpaAI />} />
           <Route path="/pages/HamptaPassTrek" element={<HamptaPassTrek />} />
           <Route path="/pages/KedarkanthaTrek" element={<KedarkanthaTrek />} />
           <Route

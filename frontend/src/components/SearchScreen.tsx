@@ -20,7 +20,7 @@ function SearchScreen() {
             <br />
             Adventure
           </h1>
-          <p className="font-tpc mb-8 text-base text-white/90 drop-shadow-md sm:text-lg md:text-xl">
+          <p className="font-tpc mb-8 text-base text-white/90 drop-shadow-lg sm:text-lg md:text-xl" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
             Journeys start where comfort ends
           </p>
 

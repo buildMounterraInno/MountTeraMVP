@@ -7,7 +7,7 @@ const Navbar = () => {
 
   // Navigation data
   const navLinks = [
-    { path: '/events', label: 'EVENTS' },
+    { path: '/', label: 'HOME' },
     { path: '/article', label: 'ARTICLE' },
     { path: '/about-us', label: 'ABOUT US' },
     { path: '/sherpa-ai', label: 'SHERPA AI' },
@@ -33,9 +33,10 @@ const Navbar = () => {
     return () => document.removeEventListener('click', closeMenu);
   }, [isOpen]);
 
-  // Glass morphism
-  const glassClasses =
-    'bg-gradient-to-r from-white/25 to-gray-400/25 backdrop-blur-md';
+  // Glass morphism - darker when scrolled
+  const glassClasses = isScrolled
+    ? 'bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-md'
+    : 'bg-gradient-to-r from-white/25 to-gray-400/25 backdrop-blur-md';
 
   return (
     <nav
