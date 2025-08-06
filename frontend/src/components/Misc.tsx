@@ -1,13 +1,14 @@
 import VideoReelCarousel from './Misc/VideoReelCarousel';
 
-// Sample video reels data - replace with your actual video paths
+// YouTube Shorts data for video reels
 const sampleReels = [
-  { videoPath: '/videos/reel1.mp4', title: 'Mountain Adventure' },
-  { videoPath: '/videos/reel1.mp4', title: 'Beach Sunset' },
-  { videoPath: '/videos/reel1.mp4', title: 'City Exploration' },
-  { videoPath: '/videos/reel1.mp4', title: 'Forest Trek' },
-  { videoPath: '/videos/reel1.mp4', title: 'Desert Safari' },
-  { videoPath: '/videos/reel1.mp4', title: 'Waterfall Visit' },
+  { videoPath: 'https://www.youtube.com/shorts/CJBQKUq9DtQ', title: 'Adventure Awaits' },
+  { videoPath: 'https://www.youtube.com/shorts/_5g8pgVCcc8', title: 'Mountain Expedition' },
+  { videoPath: 'https://www.youtube.com/shorts/T_OQ3izl1xo', title: 'Trek Journey' },
+  { videoPath: 'https://www.youtube.com/shorts/LquENe14iaA', title: 'Nature Explorer' },
+  { videoPath: 'https://www.youtube.com/shorts/Wx5xO8M0z6E', title: 'Wild Experience' },
+  { videoPath: 'https://www.youtube.com/shorts/AfX8dwp_t6A', title: 'Epic Adventures' },
+  
 ];
 
 const Misc = () => {

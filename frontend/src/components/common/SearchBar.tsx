@@ -20,7 +20,11 @@ const activeButtonStyle = 'bg-gray-100';
 const hoverButtonStyle = 'hover:bg-gray-50';
 const roundedStyle = 'rounded-[32px]';
 
-const SearchBar = () => {
+interface SearchBarProps {
+  onSearchTypeChange?: (type: SearchType) => void;
+}
+
+const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
   const [activeSection, setActiveSection] = useState<SearchSection>(null);
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const [searchData, setSearchData] = useState<SearchData>({
@@ -111,7 +115,11 @@ const SearchBar = () => {
       <div className="mb-4 flex justify-start">
         <div className="flex gap-3">
           <button
-            onClick={() => setSearchData(prev => ({ ...prev, searchType: 'events-experiences' }))}
+            onClick={() => {
+              const newType = 'events-experiences';
+              setSearchData(prev => ({ ...prev, searchType: newType }));
+              onSearchTypeChange?.(newType);
+            }}
             className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${
               searchData.searchType === 'events-experiences'
                 ? 'bg-[#1E63EF] text-white shadow-md'
@@ -122,7 +130,11 @@ const SearchBar = () => {
             Events & Experiences
           </button>
           <button
-            onClick={() => setSearchData(prev => ({ ...prev, searchType: 'adventures' }))}
+            onClick={() => {
+              const newType = 'adventures';
+              setSearchData(prev => ({ ...prev, searchType: newType }));
+              onSearchTypeChange?.(newType);
+            }}
             className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${
               searchData.searchType === 'adventures'
                 ? 'bg-[#1E63EF] text-white shadow-md'

@@ -189,7 +189,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Tab Selection */}
-          <div className="px-6 pb-4">
+          <div className="px- pb-2">
             {/* Mobile: Stacked Layout */}
             <div className="flex flex-col space-y-2 md:hidden">
               {[

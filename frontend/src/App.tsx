@@ -1,18 +1,23 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
 import LandingPage from './pages/LandingPage';
-import HamptaPassTrek from './pages/HamptaPassTrek';
-import KedarkanthaTrek from './pages/KedarkanthaTrek';
-import ValleyOfFlowersTrek from './pages/ValleyOfFlowersTrek';
-import KashmirGreatLakesTrek from './pages/KashmirGreatLakesTrek';
-import ChadarTrek from './pages/ChadarTrek';
-import RoopkundTrek from './pages/RoopkundTrek';
+import HamptaPassTrek from './pages/trekks/HamptaPassTrek';
+import KedarkanthaTrek from './pages/trekks/KedarkanthaTrek';
+import ValleyOfFlowersTrek from './pages/trekks/ValleyOfFlowersTrek';
+import KashmirGreatLakesTrek from './pages/trekks/KashmirGreatLakesTrek';
+import ChadarTrek from './pages/trekks/ChadarTrek';
+import RoopkundTrek from './pages/trekks/RoopkundTrek';
 import SearchResults from './pages/SearchResults';
 import SherpaAI from './pages/SherpaAI';
+import Articles from './pages/Articles';
+import ArticlePage from './pages/ArticlePage';
+import AboutUs from './pages/AboutUs';
+import TestPage from './pages/TestPage';
+import SimpleTest from './pages/SimpleTest';
 
 
 // App Currently Deployed on two space. One is the OG vercel - get it from uploading from github
-// Second is the tpc-dev link on Gyani's vercel - ask me
+// Second is the tpc-dev link on my vercel - ask me
 function App() {
   return (
     <BrowserRouter>
@@ -20,6 +25,11 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/article" element={<Articles />} />
+          <Route path="/article/:slug" element={<ArticlePage />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/test" element={<TestPage />} />
+          <Route path="/simple-test" element={<SimpleTest />} />
           <Route path="/sherpa-ai" element={<SherpaAI />} />
           <Route path="/pages/HamptaPassTrek" element={<HamptaPassTrek />} />
           <Route path="/pages/KedarkanthaTrek" element={<KedarkanthaTrek />} />

@@ -147,7 +147,7 @@ const Footer = () => {
 
           {/* App Downloads */}
           <div className="col-span-1 sm:col-span-1">
-            <h3 className="mb-4 font-bold">Meet us outdoors</h3>
+            {/* <h3 className="mb-4 font-bold">Meet us outdoors</h3> */}
             {/* <div className="space-y-3">
               <a href="#" className="block">
                 <img

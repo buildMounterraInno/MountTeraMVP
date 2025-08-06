@@ -1,8 +1,46 @@
+import { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import backgroundImage from '../assets/Background.jpg';
 
 
 // To be kept as static page for now lol
 const SherpaAI = () => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      // EmailJS configuration - you'll need to replace these with your actual EmailJS credentials
+      const templateParams = {
+        user_email: email,
+        to_email: 'contact.trippechalo.in@gmail.com',
+        subject: 'Sherpa AI Early Access Request',
+        message: `A user with email ${email} has requested early access to Sherpa AI.`
+      };
+
+      await emailjs.send(
+        'service_9y5zb79', // Replace with your EmailJS service ID
+        'template_tr6ijce', // Replace with your EmailJS template ID
+        templateParams,
+        'N6-65GCbxt8g79sQY' 
+      );
+
+      setSubmitStatus('success');
+      setEmail('');
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <main className="relative min-h-screen w-full overflow-visible">
       {/* Background with overlay - Same as landing page */}
@@ -60,16 +98,41 @@ const SherpaAI = () => {
             <p className="font-tpc text-white/80 mb-6 drop-shadow-md">
               Get notified when we launch and receive exclusive early access to your personal travel assistant.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            
+            {submitStatus === 'success' && (
+              <div className="mb-4 p-3 bg-green-500/20 border border-green-500/40 rounded-xl">
+                <p className="font-tpc text-green-300 text-sm">
+                  Thank you! We'll notify you when Sherpa AI launches.
+                </p>
+              </div>
+            )}
+            
+            {submitStatus === 'error' && (
+              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/40 rounded-xl">
+                <p className="font-tpc text-red-300 text-sm">
+                  Something went wrong. Please try again.
+                </p>
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+                required
+                disabled={isSubmitting}
+                className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent disabled:opacity-50"
               />
-              <button className="px-8 py-3 bg-white/25 backdrop-blur-lg border border-white/40 text-white font-semibold rounded-xl hover:bg-white/30 hover:shadow-lg transition-all duration-300 hover:scale-105 font-tpc">
-                Notify Me
+              <button 
+                type="submit"
+                disabled={isSubmitting || !email}
+                className="px-8 py-3 bg-white/25 backdrop-blur-lg border border-white/40 text-white font-semibold rounded-xl hover:bg-white/30 hover:shadow-lg transition-all duration-300 hover:scale-105 font-tpc disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isSubmitting ? 'Sending...' : 'Notify Me'}
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>
