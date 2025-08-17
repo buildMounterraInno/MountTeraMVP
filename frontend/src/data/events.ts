@@ -1,53 +1,36 @@
-import MockPicEvents from '../assets/CategoryImages/Events/MockPicEvents.jpg';
+import image1 from '../assets/CategoryImages/Events/image1.jpg';
+import image2 from '../assets/CategoryImages/Events/image2.jpg';
+import image3 from '../assets/CategoryImages/Events/image3.jpg';
 
 export interface Event {
   id: number;
   destinationImage: string;
   catchPhrase: string;
   state: string;
+  price: number;
 }
 
 export const events: Event[] = [
   {
     id: 1,
-    destinationImage: MockPicEvents,
-    catchPhrase: 'Thrissur Puram',
-    state: 'Kerala',
+    destinationImage: image1,
+    catchPhrase: 'Heritage Walk at Hyderabad',
+    state: 'Telangana',
+    price: 1000
   },
   {
     id: 2,
-    destinationImage: MockPicEvents,
-    catchPhrase: 'Goa Carnival',
+    destinationImage: image2,
+    catchPhrase: 'Morning Yoga Retreat',
     state: 'Goa',
+     price: 800
   },
   {
     id: 3,
-    destinationImage: MockPicEvents,
-    catchPhrase: 'Pushkar Camel Fair',
-    state: 'Rajasthan',
-  },
-  {
-    id: 4,
-    destinationImage: MockPicEvents,
-    catchPhrase: 'Durga Puja',
-    state: 'West Bengal',
-  },
-  {
-    id: 5,
-    destinationImage: MockPicEvents,
-    catchPhrase: 'Ganesh Chaturthi',
-    state: 'Maharashtra',
-  },
-  {
-    id: 6,
-    destinationImage: MockPicEvents,
-    catchPhrase: 'Kumbh Mela',
-    state: 'Uttar Pradesh',
-  },
-  {
-    id: 7,
-    destinationImage: MockPicEvents,
-    catchPhrase: 'Hornbill Festival',
-    state: 'Nagaland',
+    destinationImage: image3,
+    catchPhrase: 'Food Festival at Golconda Fort',
+    state: 'Telangana',
+     price: 1200
   },
 ];
+

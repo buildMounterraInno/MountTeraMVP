@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import articleHeroImage from '../assets/ArticleHero.jpg';
+// Removed import for articleHeroImage as we're using video instead
 import { getFeaturedArticles } from '../lib/articles';
 import { Article } from '../lib/supabase';
 
@@ -84,13 +84,18 @@ const Articles = () => {
      
         {/* Hero Section */}
       <section className="relative h-screen w-full">
-        {/* Hero Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${articleHeroImage})` }}
-        >
-          {/* Gradient Overlay - Only behind text area */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+        {/* Hero Background Video */}
+        <div className="absolute inset-0 overflow-hidden">
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src="/videos/article_page.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
 
         {/* Hero Text Overlay */}

@@ -4,6 +4,7 @@ const EventTile: React.FC<Event> = ({
   destinationImage,
   catchPhrase,
   state,
+  price
 }) => {
   return (
     <article
@@ -22,6 +23,7 @@ const EventTile: React.FC<Event> = ({
           {catchPhrase}
         </h3>
         <p className="text-sm text-white/90">{state}</p>
+        <p className="text-sm font-medium text-white">₹{price} / person</p>
       </div>
     </article>
   );

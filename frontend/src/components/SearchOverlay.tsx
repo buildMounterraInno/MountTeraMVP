@@ -5,6 +5,7 @@ import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { useNavigate } from 'react-router-dom';
 import TypewriterText from './TypewriterText';
+import { type Event, events } from '../data/events';
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -20,6 +21,33 @@ interface SearchData {
   adults: number;
   searchType: SearchType;
 }
+
+const EventTile: React.FC<Event> = ({
+  destinationImage,
+  catchPhrase,
+  state,
+  price
+}) => {
+  return (
+    <article
+      className="relative h-40 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-shadow hover:shadow-lg"
+      style={{ backgroundImage: `url(${destinationImage})` }}
+      aria-labelledby={`event-title-${state}`}
+    >
+      <div className="absolute inset-0 z-0 bg-gradient-to-t from-black/40"></div>
+      <div className="absolute bottom-3 left-3 z-10 text-left">
+        <h3
+          id={`event-title-${catchPhrase}`}
+          className="text-sm font-semibold text-white text-left"
+        >
+          {catchPhrase}
+        </h3>
+        <p className="text-xs text-white/90 text-left">{state}</p>
+        <p className="text-xs font-medium text-white text-left">₹{price} / person</p>
+      </div>
+    </article>
+  );
+};
 
 const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
   const [activeSection, setActiveSection] = useState<SearchSection>(null);
@@ -283,6 +311,18 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Events Section */}
+              <div className="mt-12 max-w-5xl mx-auto">
+                <h2 className="mb-6 text-2xl font-bold text-white text-center">
+                  Enjoy the local Events around you
+                </h2>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {events.slice(0, 6).map((event) => (
+                    <EventTile key={event.id} {...event} />
+                  ))}
+                </div>
               </div>
             </div>
           </div>

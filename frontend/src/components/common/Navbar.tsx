@@ -232,11 +232,14 @@ const Navbar = () => {
 
       {/* Floating Search Button */}
       <div
-        className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-500 ${
+        className={`fixed left-1/2 transform -translate-x-1/2 z-40 transition-all duration-500 ${
           showSearchIcon 
             ? 'opacity-100 translate-y-0' 
             : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
+        style={{
+          top: isScrolled ? '72px' : '104px' // Adjust based on navbar height: scrolled (16px + 56px) vs unscrolled (28px + 76px)
+        }}
       >
         <button
           onClick={() => setIsSearchOverlayOpen(true)}
