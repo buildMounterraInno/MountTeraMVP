@@ -20,10 +20,40 @@ const AuthCallback: React.FC = () => {
           // Check portal type for OAuth users
           const userPortalType = data.session.user.user_metadata?.portal_type;
           
-          if (userPortalType && userPortalType !== 'customer') {
-            console.log('OAuth user has wrong portal type, signing out');
+          // If user doesn't have portal_type (new Google OAuth user), set it to customer
+          if (!userPortalType) {
+            console.log('New Google OAuth user, setting portal_type to customer');
+            const { error: updateError } = await supabase.auth.updateUser({
+              data: { 
+                portal_type: 'customer',
+                updated_at: new Date().toISOString()
+              }
+            });
+            
+            if (updateError) {
+              console.error('Failed to set portal_type for OAuth user:', updateError);
+              await supabase.auth.signOut();
+              navigate('/?error=metadata_update_failed');
+              return;
+            }
+            
+            console.log('✅ Portal type set to customer for Google OAuth user');
+            navigate('/');
+            return;
+          }
+          
+          // Block vendor users from customer portal (same as email auth)
+          if (userPortalType === 'vendor') {
+            console.log('🚫 Vendor user detected via Google OAuth, signing out');
             await supabase.auth.signOut();
-            navigate('/?error=wrong_portal');
+            navigate('/?error=vendor_portal_required');
+            return;
+          }
+          
+          if (userPortalType !== 'customer') {
+            console.log('OAuth user has unknown portal type, signing out');
+            await supabase.auth.signOut();
+            navigate('/?error=unauthorized_portal');
             return;
           }
           

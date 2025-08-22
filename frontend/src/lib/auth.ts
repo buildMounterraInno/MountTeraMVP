@@ -77,11 +77,8 @@ export const signIn = async (email: string, password: string): Promise<AuthRespo
         console.log('🚫 Vendor user detected, signing out');
         await supabase.auth.signOut();
         
-        const portalError: AuthError = {
-          name: 'AuthError',
-          message: 'This account is registered for the vendor portal. Please use the vendor login page.',
-          status: 400
-        };
+        const portalError = new Error('This account is registered for the vendor portal. Please use the vendor login page.') as AuthError;
+        portalError.status = 400;
         
         return { user: null, error: portalError };
       } else if (!userPortalType) {
@@ -90,11 +87,8 @@ export const signIn = async (email: string, password: string): Promise<AuthRespo
         console.log('🚫 User has no portal_type - cannot determine portal access');
         await supabase.auth.signOut();
         
-        const portalError: AuthError = {
-          name: 'AuthError',
-          message: 'Your account needs to be set up for this portal. Please sign up again or contact support.',
-          status: 400
-        };
+        const portalError = new Error('Your account needs to be set up for this portal. Please sign up again or contact support.') as AuthError;
+        portalError.status = 400;
         
         return { user: null, error: portalError };
       } else {
@@ -102,11 +96,8 @@ export const signIn = async (email: string, password: string): Promise<AuthRespo
         console.log('🚫 User has unknown portal_type:', userPortalType);
         await supabase.auth.signOut();
         
-        const portalError: AuthError = {
-          name: 'AuthError',
-          message: 'This account is not authorized for this portal.',
-          status: 400
-        };
+        const portalError = new Error('This account is not authorized for this portal.') as AuthError;
+        portalError.status = 400;
         
         return { user: null, error: portalError };
       }

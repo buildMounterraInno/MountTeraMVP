@@ -44,12 +44,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             // Valid customer user
             setSession(initialSession);
             setUser(initialSession.user);
-          } else {
-            // Wrong portal type or no portal type - sign out
-            console.log('User has invalid portal access, signing out. Portal type:', userPortalType);
+          } else if (userPortalType === 'vendor') {
+            // Vendor user - sign out
+            console.log('Vendor user detected on customer portal, signing out');
             await supabase.auth.signOut();
             setSession(null);
             setUser(null);
+          } else {
+            // No portal type - might be OAuth user, let them through for now
+            setSession(initialSession);
+            setUser(initialSession.user);
           }
         } else {
           setSession(initialSession);
@@ -70,10 +74,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (session?.user && event === 'SIGNED_IN') {
           const userPortalType = session.user.user_metadata?.portal_type;
           
-          if (userPortalType !== 'customer') {
-            console.log('User has invalid portal access during sign in, signing out. Portal type:', userPortalType);
+          // Only block users with explicit wrong portal type (vendor)
+          // Allow users with undefined portal_type (new OAuth users)
+          if (userPortalType === 'vendor') {
+            console.log('Vendor user detected, signing out. Portal type:', userPortalType);
             await supabase.auth.signOut();
             return; // Exit early, the SIGNED_OUT event will handle state updates
+          }
+          
+          // For OAuth users without portal_type, let AuthCallback handle it
+          if (!userPortalType && window.location.pathname === '/auth/callback') {
+            console.log('OAuth user without portal_type, letting AuthCallback handle it');
+            // Continue and let AuthCallback set the portal_type
           }
         }
         

@@ -14,6 +14,7 @@ import ArticlePage from './pages/ArticlePage';
 import AboutUs from './pages/AboutUs';
 import TestPage from './pages/TestPage';
 import SimpleTest from './pages/SimpleTest';
+import AuthCallback from './components/AuthCallback';
 
 
 // App Currently Deployed on two space. One is the OG vercel - get it from uploading from github
@@ -22,6 +23,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Auth callback route - outside MainLayout */}
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<SearchResults />} />
