@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SearchOverlay from '../SearchOverlay';
 import LoginModal from '../LoginModal';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,8 +10,10 @@ const Navbar = () => {
   const [showSearchIcon, setShowSearchIcon] = useState(false);
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const location = useLocation();
   const isLandingPage = location.pathname === '/';
+  const { user, loading, signOut } = useAuth();
 
   // Navigation data
   const allNavLinks = [
@@ -62,6 +65,31 @@ const Navbar = () => {
     return () => document.removeEventListener('click', closeMenu);
   }, [isOpen]);
 
+  // Close user dropdown when clicking outside
+  useEffect(() => {
+    if (!showUserDropdown) return;
+
+    const closeDropdown = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('.user-dropdown')) {
+        setShowUserDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', closeDropdown);
+    return () => document.removeEventListener('click', closeDropdown);
+  }, [showUserDropdown]);
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setShowUserDropdown(false);
+      setIsLoginModalOpen(false);
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
   // Glass morphism - always dark
   const glassClasses = 'bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-md';
 
@@ -97,28 +125,68 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Right Section - Profile & Vendor Button */}
+          {/* Right Section - Profile & Actions */}
           <div className="flex items-center space-x-4">
-            {/* Profile Icon */}
-            <button
-              onClick={() => setIsLoginModalOpen(true)}
-              className="text-white transition-colors duration-200 hover:text-gray-300"
-              aria-label="Profile"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </button>
+            {loading ? (
+              <div className="w-8 h-8 animate-pulse bg-white/20 rounded-full"></div>
+            ) : user ? (
+              <div className="relative user-dropdown">
+                <button
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
+                  className="flex items-center space-x-2 text-white transition-colors duration-200 hover:text-gray-300"
+                  aria-label="User menu"
+                >
+                  <div className="w-8 h-8 bg-[#1E63EF] rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {user.email?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium hidden lg:block">Welcome, {user.email?.split('@')[0]}</span>
+                </button>
 
-            {/* Become a Vendor Button */}
-            <a 
-              href="https://tpc-vendor-in-dev.vercel.app/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-[#1E63EF] hover:bg-[#1750CC] text-white font-semibold px-4 py-1.5 text-sm rounded-full transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
-            >
-              Become a Vendor
-            </a>
+                {/* User Dropdown */}
+                {showUserDropdown && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+                    <div className="p-3 border-b">
+                      <p className="text-sm font-medium text-gray-900">{user.email}</p>
+                      <p className="text-xs text-gray-500">Customer</p>
+                    </div>
+                    <div className="p-1">
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* Profile Icon */}
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="text-white transition-colors duration-200 hover:text-gray-300"
+                  aria-label="Profile"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </button>
+
+                {/* Become a Vendor Button */}
+                <a 
+                  href="https://tpc-vendor-in-dev.vercel.app/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-[#1E63EF] hover:bg-[#1750CC] text-white font-semibold px-4 py-1.5 text-sm rounded-full transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
+                >
+                  Become a Vendor
+                </a>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -134,16 +202,23 @@ const Navbar = () => {
 
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-1">
-            {/* Mobile Profile */}
-            <button
-              onClick={() => setIsLoginModalOpen(true)}
-              className="p-2 text-white transition-colors duration-200 hover:text-gray-300"
-              aria-label="Profile"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </button>
+            {loading ? (
+              <div className="w-8 h-8 animate-pulse bg-white/20 rounded-full"></div>
+            ) : user ? (
+              <div className="w-8 h-8 bg-[#1E63EF] rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {user.email?.charAt(0).toUpperCase()}
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="p-2 text-white transition-colors duration-200 hover:text-gray-300"
+                aria-label="Profile"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -193,16 +268,34 @@ const Navbar = () => {
             ))}
           </nav>
 
-          {/* Become a Vendor Button */}
-          <a 
-            href="https://tpc-vendor-in-dev.vercel.app/" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            onClick={() => setIsOpen(false)}
-            className="block w-full text-center bg-[#1E63EF] hover:bg-[#1750CC] text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 mb-6"
-          >
-            Become a Vendor
-          </a>
+          {/* User Actions */}
+          {user ? (
+            <div className="mb-6">
+              <div className="mb-4 p-4 bg-white/10 rounded-lg">
+                <p className="text-white text-sm font-medium">{user.email}</p>
+                <p className="text-gray-300 text-xs">Customer</p>
+              </div>
+              <button
+                onClick={() => {
+                  handleSignOut();
+                  setIsOpen(false);
+                }}
+                className="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-200"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <a 
+              href="https://tpc-vendor-in-dev.vercel.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+              className="block w-full text-center bg-[#1E63EF] hover:bg-[#1750CC] text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 mb-6"
+            >
+              Become a Vendor
+            </a>
+          )}
 
           {/* Mobile Search Icon */}
           {showSearchIcon && (

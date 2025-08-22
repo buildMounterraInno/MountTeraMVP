@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './common/Navbar';
 import Footer from './common/Footer';
+import AuthDebug from './AuthDebug';
 
 function MainLayout() {
   return (
@@ -13,6 +14,9 @@ function MainLayout() {
       </main>
 
       <Footer />
+      
+      {/* Debug panel - remove in production */}
+      <AuthDebug />
     </div>
   );
 }
