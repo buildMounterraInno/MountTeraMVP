@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SherpaApiService } from '../services/sherpaApi';
-import type { TrekResponse } from '../services/sherpaApi';
+import { SherpaApiService } from '../services/sherpa-api';
+import type { TrekResponse } from '../services/sherpa-api';
 
 interface Message {
   id: string;
@@ -147,7 +147,6 @@ const SherpaAI = () => {
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isServiceAvailable, setIsServiceAvailable] = useState<boolean | null>(null);
   const [currentChatTitle, setCurrentChatTitle] = useState('New Chat');
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
@@ -169,11 +168,9 @@ const SherpaAI = () => {
 
   const checkServiceHealth = async () => {
     try {
-      const isAvailable = await SherpaApiService.isServiceAvailable();
-      setIsServiceAvailable(isAvailable);
+      await SherpaApiService.isServiceAvailable();
     } catch (error) {
       console.error('Service health check failed:', error);
-      setIsServiceAvailable(false);
     }
   };
 
@@ -304,7 +301,7 @@ const SherpaAI = () => {
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
           <AnimatePresence>
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <motion.div
                 key={message.id}
                 initial={{ y: 20, opacity: 0 }}

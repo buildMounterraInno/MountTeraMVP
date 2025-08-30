@@ -27,19 +27,19 @@ const CalendarIcon = ({ className }: { className: string }) => (
 
 const categories: Category[] = [
   { 
-    id: 'Treks', 
-    label: 'Adventures', 
-    icon: <MountainIcon className="w-5 h-5 md:w-6 md:h-6" />
-  },
-  { 
     id: 'EventsAndExperiences', 
     label: 'Events & Experiences', 
     icon: <CalendarIcon className="w-5 h-5 md:w-6 md:h-6" />
   },
+  { 
+    id: 'Treks', 
+    label: 'Adventures', 
+    icon: <MountainIcon className="w-5 h-5 md:w-6 md:h-6" />
+  },
 ];
 
 export default function CategoryTabs() {
-  const [activeTab, setActiveTab] = useState<CategoryId>('Treks');
+  const [activeTab, setActiveTab] = useState<CategoryId>('EventsAndExperiences');
 
   return (
     <section className="w-full bg-[#F2F2F2]">

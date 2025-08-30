@@ -1,12 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useEffect, useState, useRef } from 'react';
-import { fetchTestimonials, Testimonial } from '../lib/supabase';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useRef } from 'react';
 
 const AboutUs = () => {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   
   const { scrollYProgress } = useScroll({
@@ -17,39 +12,6 @@ const AboutUs = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    
-    const loadTestimonials = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchTestimonials();
-        setTestimonials(data);
-      } catch (err) {
-        console.error('Failed to load testimonials:', err);
-        setTestimonials([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadTestimonials();
-  }, []);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (!scrollContainerRef.current) return;
-    
-    const scrollAmount = 400;
-    const currentScroll = scrollContainerRef.current.scrollLeft;
-    const targetScroll = direction === 'left' 
-      ? currentScroll - scrollAmount 
-      : currentScroll + scrollAmount;
-
-    scrollContainerRef.current.scrollTo({
-      left: targetScroll,
-      behavior: 'smooth'
-    });
-  };
 
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
