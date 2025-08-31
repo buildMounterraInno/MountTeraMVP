@@ -10,6 +10,7 @@ const EventCard: React.FC<EventCardProps> = ({ eventItem, onClick }) => {
   const [eventDetails, setEventDetails] = useState<DetailedEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -18,7 +19,6 @@ const EventCard: React.FC<EventCardProps> = ({ eventItem, onClick }) => {
         const details = await NearbyApiService.getEventDetails(eventItem.id);
         setEventDetails(details);
       } catch (err) {
-        console.error('Error fetching event details:', err);
         setError(err instanceof Error ? err.message : 'Failed to load event details');
       } finally {
         setLoading(false);
@@ -86,15 +86,21 @@ const EventCard: React.FC<EventCardProps> = ({ eventItem, onClick }) => {
     >
       {/* Banner Image - Top */}
       <div className="h-60 relative overflow-hidden rounded-t-xl">
-        <img 
-          src={eventDetails?.banner_image || `https://via.placeholder.com/384x240/3b82f6/ffffff?text=${encodeURIComponent(eventDetails?.event_name || 'Event')}`}
-          alt={eventDetails?.event_name || 'Event'}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            console.log('Image failed to load, original URL:', eventDetails?.banner_image);
-            (e.target as HTMLImageElement).src = `https://via.placeholder.com/384x240/3b82f6/ffffff?text=${encodeURIComponent(eventDetails?.event_name?.substring(0, 10) || 'Event')}`;
-          }}
-        />
+        {imageError ? (
+          <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+            <div className="text-center text-white">
+              <div className="text-4xl mb-2">📅</div>
+              <p className="text-sm font-medium">{eventDetails?.event_name?.substring(0, 20) || 'Event'}</p>
+            </div>
+          </div>
+        ) : (
+          <img 
+            src={eventDetails?.banner_image || `https://placehold.co/384x240/3b82f6/ffffff?text=${encodeURIComponent(eventDetails?.event_name || 'Event')}`}
+            alt={eventDetails?.event_name || 'Event'}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        )}
         <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs">
           {eventItem.distance_km.toFixed(1)} km away
         </div>

@@ -11,7 +11,7 @@ function SearchScreen() {
   return (
     <section className="relative h-[94vh] w-full overflow-visible md:p-4 md:bg-[#f2f2f2]">
       {/* Container - only on desktop */}
-      <div className="relative h-full w-full md:rounded-[15px] md:overflow-hidden">
+      <div className="relative h-full w-full md:rounded-[15px] overflow-visible">
         {/* Background with overlay */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"

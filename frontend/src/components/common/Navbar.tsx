@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SearchOverlay from '../SearchOverlay';
 import LoginModal from '../LoginModal';
+import ProfileDropdown from '../ProfileDropdown';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCustomer } from '../../contexts/CustomerContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,10 +12,10 @@ const Navbar = () => {
   const [showSearchIcon, setShowSearchIcon] = useState(false);
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const location = useLocation();
   const isLandingPage = location.pathname === '/';
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
+  const { customer, loading: customerLoading } = useCustomer();
 
   // Navigation data
   const allNavLinks = [
@@ -65,30 +67,6 @@ const Navbar = () => {
     return () => document.removeEventListener('click', closeMenu);
   }, [isOpen]);
 
-  // Close user dropdown when clicking outside
-  useEffect(() => {
-    if (!showUserDropdown) return;
-
-    const closeDropdown = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest('.user-dropdown')) {
-        setShowUserDropdown(false);
-      }
-    };
-
-    document.addEventListener('click', closeDropdown);
-    return () => document.removeEventListener('click', closeDropdown);
-  }, [showUserDropdown]);
-
-  // Handle sign out
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      setShowUserDropdown(false);
-      setIsLoginModalOpen(false);
-    } catch (error) {
-      console.error('Sign out error:', error);
-    }
-  };
 
   // Glass morphism - always dark
   const glassClasses = 'bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-md';
@@ -127,42 +105,10 @@ const Navbar = () => {
 
           {/* Right Section - Profile & Actions */}
           <div className="flex items-center space-x-4">
-            {loading ? (
+            {loading || customerLoading ? (
               <div className="w-8 h-8 animate-pulse bg-white/20 rounded-full"></div>
             ) : user ? (
-              <div className="relative user-dropdown">
-                <button
-                  onClick={() => setShowUserDropdown(!showUserDropdown)}
-                  className="flex items-center space-x-2 text-white transition-colors duration-200 hover:text-gray-300"
-                  aria-label="User menu"
-                >
-                  <div className="w-8 h-8 bg-[#1E63EF] rounded-full flex items-center justify-center text-white text-sm font-medium">
-                    {user.email?.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="text-sm font-medium hidden lg:block">Welcome, {user.email?.split('@')[0]}</span>
-                </button>
-
-                {/* User Dropdown */}
-                {showUserDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
-                    <div className="p-3 border-b">
-                      <p className="text-sm font-medium text-gray-900">{user.email}</p>
-                      <p className="text-xs text-gray-500">Customer</p>
-                    </div>
-                    <div className="p-1">
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Sign Out
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <ProfileDropdown customer={customer} />
             ) : (
               <>
                 {/* Profile Icon */}
@@ -202,11 +148,21 @@ const Navbar = () => {
 
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-1">
-            {loading ? (
+            {loading || customerLoading ? (
               <div className="w-8 h-8 animate-pulse bg-white/20 rounded-full"></div>
             ) : user ? (
-              <div className="w-8 h-8 bg-[#1E63EF] rounded-full flex items-center justify-center text-white text-sm font-medium">
-                {user.email?.charAt(0).toUpperCase()}
+              <div className="relative">
+                {customer?.avatar_url ? (
+                  <img
+                    src={customer.avatar_url}
+                    alt={customer.first_name || 'Profile'}
+                    className="w-8 h-8 rounded-full object-cover border-2 border-white/30"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white/30">
+                    {customer?.first_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
             ) : (
               <button
@@ -272,18 +228,44 @@ const Navbar = () => {
           {user ? (
             <div className="mb-6">
               <div className="mb-4 p-4 bg-white/10 rounded-lg">
-                <p className="text-white text-sm font-medium">{user.email}</p>
-                <p className="text-gray-300 text-xs">Customer</p>
+                <div className="flex items-center gap-3 mb-2">
+                  {customer?.avatar_url ? (
+                    <img
+                      src={customer.avatar_url}
+                      alt={customer.first_name || 'Profile'}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      {customer?.first_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-white text-sm font-medium">
+                      {customer?.first_name && customer?.last_name 
+                        ? `${customer.first_name} ${customer.last_name}`
+                        : user.email?.split('@')[0]
+                      }
+                    </p>
+                    <p className="text-gray-300 text-xs">{user.email}</p>
+                  </div>
+                </div>
+                {customer && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-300">Profile Complete</span>
+                    <span className="text-xs font-bold text-blue-300">
+                      {customer.profile_completion_percentage || 0}%
+                    </span>
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => {
-                  handleSignOut();
-                  setIsOpen(false);
-                }}
-                className="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-200"
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 mb-3"
               >
-                Sign Out
-              </button>
+                View Profile
+              </Link>
             </div>
           ) : (
             <a 
@@ -356,6 +338,7 @@ const Navbar = () => {
         isOpen={isLoginModalOpen} 
         onClose={() => setIsLoginModalOpen(false)} 
       />
+
     </nav>
   );
 };

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { NearbyApiService, type LocationCoordinates, type NearbyEventsResponse, type NearbyExperiencesResponse, type NearbyEventItem, type NearbyExperienceItem } from '../../services/nearby-api';
 import EventCard from '../cards/EventCard';
 import ExperienceCard from '../cards/ExperienceCard';
 import CardCarousel from '../ui/CardCarousel';
 
 const EventsAndExperiences = () => {
+  const navigate = useNavigate();
   const [location, setLocation] = useState<LocationCoordinates | null>(null);
   const [eventsData, setEventsData] = useState<NearbyEventsResponse | null>(null);
   const [experiencesData, setExperiencesData] = useState<NearbyExperiencesResponse | null>(null);
@@ -25,8 +27,6 @@ const EventsAndExperiences = () => {
 
       // Fetch nearby events and experiences
       const { events, experiences } = await NearbyApiService.getNearbyEventsAndExperiences(coordinates);
-      console.log('API Response - Events:', events);
-      console.log('API Response - Experiences:', experiences);
       setEventsData(events);
       setExperiencesData(experiences);
     } catch (err) {
@@ -47,13 +47,11 @@ const EventsAndExperiences = () => {
   }, []);
 
   const handleEventCardClick = (eventId: string) => {
-    console.log('Event clicked:', eventId);
-    // TODO: Navigate to booking page
+    navigate(`/booking/event/${eventId}`);
   };
 
   const handleExperienceCardClick = (experienceId: string) => {
-    console.log('Experience clicked:', experienceId);
-    // TODO: Navigate to booking page
+    navigate(`/booking/experience/${experienceId}`);
   };
 
   if (loading) {

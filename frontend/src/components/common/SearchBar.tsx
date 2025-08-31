@@ -15,6 +15,13 @@ interface SearchData {
   searchType: SearchType;
 }
 
+interface SearchResult {
+  id: string;
+  name: string;
+  address: string;
+  type: 'event' | 'experience';
+}
+
 const baseButtonStyle = 'relative cursor-pointer transition-all';
 const activeButtonStyle = 'bg-gray-100';
 const hoverButtonStyle = 'hover:bg-gray-50';
@@ -33,8 +40,59 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
     adults: 0,
     searchType: 'events-experiences',
   });
+  const [searchSuggestions, setSearchSuggestions] = useState<SearchResult[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // API search function
+  const searchAPI = async (searchTerm: string) => {
+    if (searchTerm.length < 3) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsLoadingSuggestions(true);
+    try {
+      const response = await fetch('https://www.vastusetu.com/api/search/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          searchTerm: searchTerm
+        })
+      });
+      
+      if (response.ok) {
+        const responseData = await response.json();
+        // Handle nested response structure
+        const data = responseData.data || responseData;
+        
+        const results: SearchResult[] = (Array.isArray(data) ? data : []).map((item: any) => {
+          // Fix type mapping based on source field
+          const mappedType = item.source === 'recurring_events' ? 'experience' : 'event';
+          
+          return {
+            id: item.id || item._id || Math.random().toString(),
+            name: item.name || item.title || item.eventName || item.event_name || 'Untitled',
+            address: item.address || item.location || item.venue || item.city || 'Location TBD',
+            type: mappedType
+          };
+        });
+        
+        setSearchSuggestions(results);
+        setShowSuggestions(true);
+      }
+    } catch (error) {
+      setSearchSuggestions([]);
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -43,12 +101,50 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
         !searchRef.current.contains(event.target as Node)
       ) {
         setActiveSection(null);
+        setShowSuggestions(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Debounced search for suggestions
+  const handleSearchInput = useCallback((value: string) => {
+    setSearchData(prev => ({ ...prev, destination: value }));
+    
+    // Only trigger API for events-experiences and show dropdown immediately
+    if (searchData.searchType === 'events-experiences') {
+      setActiveSection('where'); // Ensure where section is active
+      
+      if (value.length >= 3) {
+        setIsLoadingSuggestions(true);
+        setShowSuggestions(true); // Show dropdown immediately when typing
+        
+        if (debounceTimer.current) {
+          clearTimeout(debounceTimer.current);
+        }
+        
+        debounceTimer.current = setTimeout(() => {
+          searchAPI(value);
+        }, 300);
+      } else {
+        setShowSuggestions(false);
+        setIsLoadingSuggestions(false);
+      }
+    } else {
+      setShowSuggestions(false);
+    }
+  }, [searchData.searchType]);
+
+  // Handle suggestion selection
+  const handleSuggestionSelect = (suggestion: SearchResult) => {
+    setSearchData(prev => ({ ...prev, destination: suggestion.name }));
+    setShowSuggestions(false);
+    setActiveSection(null);
+    // Navigate to booking page for the selected item
+    navigate(`/booking/${suggestion.type}/${suggestion.id}`);
+  };
 
   const handleSearch = useCallback(() => {
     const searchParams = new URLSearchParams();
@@ -63,6 +159,7 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
     }
     searchParams.set('type', searchData.searchType);
     setIsMobileModalOpen(false);
+    setShowSuggestions(false);
     navigate(`/search?${searchParams.toString()}`);
   }, [searchData, navigate]);
 
@@ -98,7 +195,12 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
         scrollToCenter();
       }, 100);
     }
-  }, [scrollToCenter]);
+    
+    // Show suggestions if clicking on where section and has content
+    if (section === 'where' && searchData.destination.length >= 3 && searchData.searchType === 'events-experiences') {
+      setShowSuggestions(true);
+    }
+  }, [scrollToCenter, searchData.destination, searchData.searchType]);
 
   const getPlaceholderText = () => {
     return searchData.searchType === 'adventures' 
@@ -158,9 +260,7 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
             label="Where"
             value={searchData.destination}
             placeholder={getPlaceholderText()}
-            onChange={(value) =>
-              setSearchData((prev) => ({ ...prev, destination: value }))
-            }
+            onChange={handleSearchInput}
           />
         </SectionButton>
 
@@ -249,12 +349,7 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
                 <input
                   type="text"
                   value={searchData.destination}
-                  onChange={(e) =>
-                    setSearchData((prev) => ({
-                      ...prev,
-                      destination: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => handleSearchInput(e.target.value)}
                   placeholder={getPlaceholderText()}
                   className="w-full rounded-lg border border-gray-300 p-4 text-lg outline-none focus:border-gray-500 transition-all duration-300"
                 />
@@ -340,6 +435,50 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
           setSearchData((prev) => ({ ...prev, adults }))
         }
       />
+
+      {/* Search Suggestions Dropdown */}
+      {showSuggestions && searchData.searchType === 'events-experiences' && activeSection === 'where' && (
+        <div className="absolute z-[60] mt-2 w-full bg-white rounded-2xl shadow-xl border border-gray-200 max-h-80 overflow-y-auto">
+          {isLoadingSuggestions ? (
+            <div className="p-4 text-center text-gray-500">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2">Searching...</p>
+            </div>
+          ) : searchSuggestions.length > 0 ? (
+            <div className="py-2">
+              {searchSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion.id}
+                  onClick={() => handleSuggestionSelect(suggestion)}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900 truncate">
+                        {suggestion.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 truncate mt-1">
+                        {suggestion.address}
+                      </p>
+                    </div>
+                    <span className={`ml-3 px-2 py-1 text-xs font-medium rounded-full ${
+                      suggestion.type === 'event' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-purple-100 text-purple-800'
+                    }`}>
+                      {suggestion.type}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : searchData.destination.length >= 3 && (
+            <div className="p-4 text-center text-gray-500">
+              No results found for "{searchData.destination}"
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

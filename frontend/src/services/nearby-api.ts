@@ -153,7 +153,6 @@ export class NearbyApiService {
       });
 
       const data = await response.json();
-      console.log('Raw nearby events API response:', data);
 
       if (!response.ok) {
         const errorData = data as ErrorResponse;
@@ -172,7 +171,6 @@ export class NearbyApiService {
       if (error instanceof Error) {
         throw error;
       }
-      console.error('Unexpected error:', error);
       throw new Error('Unable to fetch nearby events');
     }
   }
@@ -200,7 +198,6 @@ export class NearbyApiService {
       });
 
       const data = await response.json();
-      console.log('Raw nearby experiences API response:', data);
 
       if (!response.ok) {
         const errorData = data as ErrorResponse;
@@ -219,7 +216,6 @@ export class NearbyApiService {
       if (error instanceof Error) {
         throw error;
       }
-      console.error('Unexpected error:', error);
       throw new Error('Unable to fetch nearby experiences');
     }
   }
@@ -252,7 +248,6 @@ export class NearbyApiService {
       if (error instanceof Error) {
         throw error;
       }
-      console.error('Unexpected error:', error);
       throw new Error('Unable to fetch event details');
     }
   }
@@ -285,7 +280,6 @@ export class NearbyApiService {
       if (error instanceof Error) {
         throw error;
       }
-      console.error('Unexpected error:', error);
       throw new Error('Unable to fetch experience details');
     }
   }

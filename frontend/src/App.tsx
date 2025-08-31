@@ -14,7 +14,10 @@ import ArticlePage from './pages/ArticlePage';
 import AboutUs from './pages/AboutUs';
 import TestPage from './pages/TestPage';
 import SimpleTest from './pages/SimpleTest';
+import ProfilePage from './pages/ProfilePage';
+import BookingPage from './pages/BookingPage';
 import AuthCallback from './components/AuthCallback';
+import ScrollToTop from './components/common/ScrollToTop';
 
 
 // App Currently Deployed on two space. One is the OG vercel - get it from uploading from github
@@ -22,6 +25,7 @@ import AuthCallback from './components/AuthCallback';
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Auth callback route - outside MainLayout */}
         <Route path="/auth/callback" element={<AuthCallback />} />
@@ -32,6 +36,8 @@ function App() {
           <Route path="/article" element={<Articles />} />
           <Route path="/article/:slug" element={<ArticlePage />} />
           <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/booking/:type/:id" element={<BookingPage />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/simple-test" element={<SimpleTest />} />
           <Route path="/sherpa-ai" element={<SherpaAI />} />

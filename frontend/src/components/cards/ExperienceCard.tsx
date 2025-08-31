@@ -10,6 +10,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experienceItem, onClick
   const [experienceDetails, setExperienceDetails] = useState<DetailedExperience | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchExperienceDetails = async () => {
@@ -18,7 +19,6 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experienceItem, onClick
         const details = await NearbyApiService.getExperienceDetails(experienceItem.id);
         setExperienceDetails(details);
       } catch (err) {
-        console.error('Error fetching experience details:', err);
         setError(err instanceof Error ? err.message : 'Failed to load experience details');
       } finally {
         setLoading(false);
@@ -76,15 +76,21 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experienceItem, onClick
     >
       {/* Banner Image - Top */}
       <div className="h-60 relative overflow-hidden rounded-t-xl">
-        <img 
-          src={experienceDetails?.experience_photo_urls?.[0] || `https://via.placeholder.com/384x240/8b5cf6/ffffff?text=${encodeURIComponent(experienceDetails?.event_name || 'Experience')}`}
-          alt={experienceDetails?.event_name || 'Experience'}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            console.log('Image failed to load, original URL:', experienceDetails?.experience_photo_urls?.[0]);
-            (e.target as HTMLImageElement).src = `https://via.placeholder.com/384x240/8b5cf6/ffffff?text=${encodeURIComponent(experienceDetails?.event_name?.substring(0, 10) || 'Experience')}`;
-          }}
-        />
+        {imageError ? (
+          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+            <div className="text-center text-white">
+              <div className="text-4xl mb-2">🎯</div>
+              <p className="text-sm font-medium">{experienceDetails?.event_name?.substring(0, 20) || 'Experience'}</p>
+            </div>
+          </div>
+        ) : (
+          <img 
+            src={experienceDetails?.experience_photo_urls?.[0] || `https://placehold.co/384x240/8b5cf6/ffffff?text=${encodeURIComponent(experienceDetails?.event_name || 'Experience')}`}
+            alt={experienceDetails?.event_name || 'Experience'}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        )}
         <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs">
           {experienceItem.distance_km.toFixed(1)} km away
         </div>
