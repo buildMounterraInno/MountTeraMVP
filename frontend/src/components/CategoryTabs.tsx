@@ -88,7 +88,7 @@ export default function CategoryTabs() {
       </div>
 
       {/* Content */}
-      <div className="px-4 pb-8 sm:px-8">
+      <div className="px-4 pb-8 pt-8 sm:px-8">
         {activeTab === 'Treks' && <Treks />}
         {activeTab === 'EventsAndExperiences' && <EventsAndExperiences />}
       </div>

@@ -25,7 +25,7 @@ const CardCarousel: React.FC<CardCarouselProps> = ({ children, title, subtitle }
   };
 
   return (
-    <section className="rounded-lg bg-gray-200 p-6 shadow-md">
+    <section className="rounded-lg bg-white p-6 shadow-xl">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between">

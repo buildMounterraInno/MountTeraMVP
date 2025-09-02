@@ -141,19 +141,70 @@ const ArticlePage = () => {
       {/* Article Content */}
       <section className="py-16 bg-[#f5f5eb]">
         <div className="max-w-4xl mx-auto px-8">
-          <div className="prose prose-lg prose-gray max-w-none">
+          <div 
+            className="font-body text-gray-800 leading-relaxed max-w-none"
+            style={{
+              fontSize: '18px',
+              lineHeight: '1.8'
+            }}
+          >
             <div 
-              className="font-body text-gray-800 leading-relaxed"
-              style={{
-                fontSize: '18px',
-                lineHeight: '1.8'
-              }}
+              className="article-content"
               dangerouslySetInnerHTML={{ 
                 __html: article.content.replace(/\n/g, '<br />') 
               }}
             />
           </div>
         </div>
+        
+        <style jsx>{`
+          .article-content {
+            /* Remove default underlines from all text */
+            text-decoration: none;
+          }
+          
+          .article-content * {
+            /* Remove underlines from all child elements */
+            text-decoration: none !important;
+          }
+          
+          .article-content a {
+            /* Only links should have underlines, and only on hover */
+            text-decoration: none !important;
+            color: #2563eb;
+            font-weight: 500;
+          }
+          
+          .article-content a:hover {
+            text-decoration: underline !important;
+          }
+          
+          .article-content p {
+            margin-bottom: 1.5rem;
+          }
+          
+          .article-content h1,
+          .article-content h2,
+          .article-content h3,
+          .article-content h4,
+          .article-content h5,
+          .article-content h6 {
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            text-decoration: none !important;
+          }
+          
+          .article-content ul,
+          .article-content ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+          }
+          
+          .article-content li {
+            margin-bottom: 0.5rem;
+          }
+        `}</style>
       </section>
 
       {/* Article Tags */}

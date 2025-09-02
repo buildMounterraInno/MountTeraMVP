@@ -372,123 +372,119 @@ const SearchResults = () => {
               </div>
             ) : filteredItems.length > 0 ? (
               <div className={`${viewMode === 'grid' 
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' 
+                ? 'flex flex-wrap gap-6 justify-start' 
                 : 'space-y-4'
               }`}>
                 {filteredItems.map((item) => {
                   const hasUrl = item.url || item.type === 'event' || item.type === 'experience';
                   const targetUrl = item.url || `/booking/${item.type}/${item.id}`;
 
-                  return hasUrl ? (
-                    <Link key={`${item.type}-${item.id}`} to={targetUrl}>
-                      {viewMode === 'grid' ? (
-                        // Grid Card View
-                        <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group border border-gray-100">
-                          <div className="relative h-52 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                  if (!hasUrl) {
+                    return (
+                      <div key={`${item.type}-${item.id}`}>
+                        {/* Non-clickable item */}
+                      </div>
+                    );
+                  }
+
+                  if (viewMode === 'grid') {
+                    // Grid Card View - Match EventCard/ExperienceCard design exactly
+                    return (
+                      <Link key={`${item.type}-${item.id}`} to={targetUrl}>
+                        <div className="w-80 h-[400px] bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-[1.02] flex-shrink-0 flex flex-col">
+                          {/* Banner Image - Top */}
+                          <div className="h-56 relative overflow-hidden rounded-2xl m-4 mb-2 flex-shrink-0">
+                            {/* Price Tag Overlay */}
+                            <div className="absolute top-4 left-4 z-10">
+                              <span className="bg-black/70 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm">
+                                From ₹{item.numericPrice || 0}
+                              </span>
+                            </div>
+                            {/* Wishlist Button */}
+                            <div className="absolute top-4 right-4 z-10">
+                              <button 
+                                onClick={(e) => e.preventDefault()}
+                                className="p-2 rounded-full shadow-sm hover:shadow-md transition-all duration-300 backdrop-blur-sm transform hover:scale-110 active:scale-95 bg-white/90 hover:bg-red-500 text-red-500 hover:text-white"
+                              >
+                                <svg className="w-4 h-4 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                              </button>
+                            </div>
                             {item.image ? (
                               <img 
                                 src={item.image} 
                                 alt={item.title}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-0"
-                                onLoad={(e) => {
-                                  e.currentTarget.classList.remove('opacity-0');
-                                  e.currentTarget.classList.add('opacity-100');
-                                }}
+                                className="w-full h-full object-cover"
                                 onError={(e) => {
-                                  const target = e.currentTarget as HTMLImageElement;
+                                  const target = e.target as HTMLImageElement;
                                   target.style.display = 'none';
                                   const parent = target.parentElement;
                                   if (parent) {
                                     parent.innerHTML = `
-                                      <div class="w-full h-full flex flex-col items-center justify-center text-gray-500">
-                                        <div class="w-16 h-16 bg-gray-300 rounded-lg mb-2 flex items-center justify-center">
-                                          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                          </svg>
+                                      <div class="w-full h-full bg-gradient-to-br ${
+                                        item.type === 'trek' ? 'from-green-500 to-green-600' :
+                                        item.type === 'event' ? 'from-blue-500 to-blue-600' : 'from-purple-500 to-purple-600'
+                                      } flex items-center justify-center">
+                                        <div class="text-center text-white">
+                                          <p class="text-sm font-medium">${item.title?.substring(0, 20) || item.type}</p>
                                         </div>
-                                        <span class="text-sm font-medium">No Image Available</span>
                                       </div>
                                     `;
                                   }
                                 }}
-                                style={{ transition: 'opacity 0.3s ease-in-out' }}
                               />
                             ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
-                                <div className="w-16 h-16 bg-gray-300 rounded-lg mb-2 flex items-center justify-center">
-                                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
+                              <div className={`w-full h-full bg-gradient-to-br ${
+                                item.type === 'trek' ? 'from-green-500 to-green-600' :
+                                item.type === 'event' ? 'from-blue-500 to-blue-600' : 'from-purple-500 to-purple-600'
+                              } flex items-center justify-center`}>
+                                <div className="text-center text-white">
+                                  <p className="text-sm font-medium">{item.title?.substring(0, 20) || item.type}</p>
                                 </div>
-                                <span className="text-sm font-medium">No Image Available</span>
                               </div>
                             )}
-                            <div className="absolute top-4 right-4">
-                              <span className={`px-3 py-1.5 text-xs font-semibold rounded-full text-white shadow-lg ${
-                                item.type === 'trek' ? 'bg-gradient-to-r from-green-500 to-green-600' :
-                                item.type === 'event' ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gradient-to-r from-purple-500 to-purple-600'
-                              }`}>
-                                {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                              </span>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           </div>
-                          <div className="p-5">
-                            <h3 className="font-bold text-gray-900 text-base mb-3 line-clamp-2 leading-tight">
-                              {item.title}
-                            </h3>
-                            <div className="flex items-center text-gray-600 text-sm mb-3">
-                              <MapPin size={14} className="mr-2 text-gray-500" />
-                              <span className="truncate font-medium">{item.location}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                {item.rating && (
-                                  <div className="flex items-center text-yellow-500 bg-yellow-50 px-2 py-1 rounded-lg">
-                                    <Star size={14} fill="currentColor" />
-                                    <span className="ml-1 text-sm font-bold text-gray-700">{item.rating}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="text-right">
-                                <div className="font-bold text-blue-600 text-lg">
-                                  ₹{item.numericPrice?.toLocaleString()}
+
+                          {/* Card Content - Bottom */}
+                          <div className="px-5 pb-5 flex-1 flex flex-col justify-end">
+                            <div className="space-y-2">
+                              <h3 className="font-bold text-lg text-gray-800 line-clamp-1">
+                                {item.title}
+                              </h3>
+                              
+                              {/* Show description if available */}
+                              <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                                {item.type === 'trek' ? 'Adventure trek experience' : 
+                                 item.type === 'event' ? 'Event experience' : 
+                                 'Experience description'}
+                              </p>
+
+                              <div className="space-y-1 pt-1">
+                                <div className="flex items-center text-gray-500 text-xs">
+                                  <svg className="w-3 h-3 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                  </svg>
+                                  {item.location}
                                 </div>
-                                <div className="text-xs text-gray-500 font-medium">per person</div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      ) : (
-                        // List View
-                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 cursor-pointer group border border-gray-100">
+                      </Link>
+                    );
+                  } else {
+                    // List View
+                    return (
+                      <Link key={`${item.type}-${item.id}`} to={targetUrl}>
+                        <div className="bg-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-5 cursor-pointer group border border-gray-100">
                           <div className="flex gap-6">
                             <div className="relative w-36 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                               {item.image ? (
                                 <img 
                                   src={item.image} 
                                   alt={item.title}
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-0"
-                                  onLoad={(e) => {
-                                    e.currentTarget.classList.remove('opacity-0');
-                                    e.currentTarget.classList.add('opacity-100');
-                                  }}
-                                  onError={(e) => {
-                                    const target = e.currentTarget as HTMLImageElement;
-                                    target.style.display = 'none';
-                                    const parent = target.parentElement;
-                                    if (parent) {
-                                      parent.innerHTML = `
-                                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-500">
-                                          <svg class="w-6 h-6 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                          </svg>
-                                          <span class="text-xs font-medium">No Image</span>
-                                        </div>
-                                      `;
-                                    }
-                                  }}
-                                  style={{ transition: 'opacity 0.3s ease-in-out' }}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 />
                               ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
@@ -532,13 +528,9 @@ const SearchResults = () => {
                             </div>
                           </div>
                         </div>
-                      )}
-                    </Link>
-                  ) : (
-                    <div key={`${item.type}-${item.id}`}>
-                      {/* Non-clickable item */}
-                    </div>
-                  );
+                      </Link>
+                    );
+                  }
                 })}
               </div>
             ) : (

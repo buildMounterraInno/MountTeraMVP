@@ -43,7 +43,7 @@ const EventCard: React.FC<EventCardProps> = ({ eventItem, onClick }) => {
 
   if (loading) {
     return (
-      <div className="w-80 h-[480px] bg-gray-200 rounded-xl shadow-md animate-pulse">
+      <div className="w-80 h-[480px] bg-white rounded-xl shadow-xl animate-pulse">
         <div className="h-60 bg-gray-300 rounded-t-xl"></div>
         <div className="p-4 space-y-3">
           <div className="h-4 bg-gray-300 rounded w-3/4"></div>
@@ -88,7 +88,7 @@ const EventCard: React.FC<EventCardProps> = ({ eventItem, onClick }) => {
 
   return (
     <div 
-      className="w-80 h-[400px] bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-[1.02] flex-shrink-0 flex flex-col"
+      className="w-80 h-[400px] bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-[1.02] flex-shrink-0 flex flex-col"
       onClick={handleClick}
     >
       {/* Banner Image - Top */}
