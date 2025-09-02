@@ -138,15 +138,33 @@ export const signInWithGoogle = async (): Promise<{ error: AuthError | null }> =
 // Sign out
 export const signOut = async (): Promise<{ error: AuthError | null }> => {
   try {
+    // Check if there's a session to sign out from
+    const { data: { session: currentSession } } = await supabase.auth.getSession();
+    
+    if (!currentSession) {
+      console.log('No active session to sign out from');
+      return { error: null };
+    }
+
     const { error } = await supabase.auth.signOut();
     
     if (error) {
+      // Handle specific auth session missing error
+      if (error.message?.includes('Auth session missing') || error.message?.includes('session missing')) {
+        console.log('Session already cleared');
+        return { error: null };
+      }
       console.error('Sign out error:', error);
       return { error };
     }
 
     return { error: null };
-  } catch (error) {
+  } catch (error: any) {
+    // Handle AuthSessionMissingError specifically
+    if (error.message?.includes('Auth session missing') || error.message?.includes('session missing')) {
+      console.log('Session already missing');
+      return { error: null };
+    }
     console.error('Sign out exception:', error);
     return { error: error as AuthError };
   }

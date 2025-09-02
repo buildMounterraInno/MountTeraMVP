@@ -9,9 +9,9 @@ function SearchScreen() {
   const [searchType, setSearchType] = useState<SearchType>('events-experiences');
 
   return (
-    <section className="relative h-[94vh] w-full overflow-visible md:p-4 md:bg-[#f2f2f2]">
+    <section className="relative h-[94vh] w-full md:p-4 md:bg-[#f2f2f2]">
       {/* Container - only on desktop */}
-      <div className="relative h-full w-full md:rounded-[15px] overflow-visible">
+      <div className="relative h-full w-full md:rounded-[20px] md:overflow-hidden">
         {/* Background with overlay */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"

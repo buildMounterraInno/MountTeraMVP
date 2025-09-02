@@ -31,7 +31,6 @@ const SearchResults = () => {
   const searchQuery = searchParams.get('destination') || '';
   const searchType = searchParams.get('type') || 'events-experiences';
   const fromDate = searchParams.get('fromDate');
-  const adults = searchParams.get('adults');
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
@@ -250,7 +249,6 @@ const SearchResults = () => {
             <p className="text-lg text-gray-600">
               {loading ? 'Searching...' : `${filteredItems.length} ${filteredItems.length === 1 ? 'result' : 'results'} found`}
               {fromDate && ` from ${new Date(fromDate).toLocaleDateString()}`}
-              {adults && ` for ${adults} ${adults === '1' ? 'guest' : 'guests'}`}
             </p>
           </div>
 

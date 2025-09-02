@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { MagnifyingGlass, User, X } from 'phosphor-react';
 import SearchOverlay from '../SearchOverlay';
 import LoginModal from '../LoginModal';
 import ProfileDropdown from '../ProfileDropdown';
@@ -20,9 +21,9 @@ const Navbar = () => {
   // Navigation data
   const allNavLinks = [
     { path: '/', label: 'HOME' },
-    { path: '/article', label: 'ARTICLE' },
-    { path: '/about-us', label: 'ABOUT US' },
-    { path: '/sherpa-ai', label: 'SHERPA AI' },
+    { path: '/article', label: 'Article' },
+    { path: '/about-us', label: 'About Us' },
+    { path: '/sherpa-ai', label: 'Sherpa AI' },
   ];
 
   // Filter navigation links based on current page
@@ -73,7 +74,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`font-tpc fixed top-0 z-50 w-full transition-all duration-300 ${
+      className={`font-nav fixed top-0 z-50 w-full transition-all duration-300 ${
         isScrolled ? 'md:py-2 md:px-4' : 'md:py-7 md:px-4'
       }`}
     >
@@ -88,7 +89,7 @@ const Navbar = () => {
               <Link
                 key={path}
                 to={path}
-                className="text-sm text-white transition-colors duration-200 hover:text-gray-300 lg:text-base font-medium"
+                className="font-nav text-sm text-white/90 transition-colors duration-200 hover:text-white lg:text-base font-normal tracking-wide"
               >
                 {label}
               </Link>
@@ -105,6 +106,18 @@ const Navbar = () => {
 
           {/* Right Section - Profile & Actions */}
           <div className="flex items-center space-x-4">
+            {/* Search Icon */}
+            <button
+              onClick={() => setIsSearchOverlayOpen(true)}
+              className={`text-white transition-colors duration-200 hover:text-gray-300 transition-all duration-500 ${
+                showSearchIcon 
+                  ? 'opacity-100 scale-100 translate-x-0' 
+                  : 'opacity-0 scale-95 translate-x-2 pointer-events-none'
+              }`}
+              aria-label="Search"
+            >
+              <MagnifyingGlass size={20} weight="regular" />
+            </button>
             {loading || customerLoading ? (
               <div className="w-8 h-8 animate-pulse bg-white/20 rounded-full"></div>
             ) : user ? (
@@ -117,9 +130,7 @@ const Navbar = () => {
                   className="text-white transition-colors duration-200 hover:text-gray-300"
                   aria-label="Profile"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <User size={20} weight="regular" />
                 </button>
 
                 {/* Become a Vendor Button */}
@@ -127,7 +138,7 @@ const Navbar = () => {
                   href="https://tpc-vendor-in-dev.vercel.app/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="bg-[#1E63EF] hover:bg-[#1750CC] text-white font-semibold px-4 py-1.5 text-sm rounded-full transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
+                  className="font-button bg-[#1E63EF] hover:bg-[#1750CC] text-white font-medium px-4 py-1.5 text-sm rounded-full transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
                 >
                   Become a Vendor
                 </a>
@@ -170,16 +181,14 @@ const Navbar = () => {
                 className="p-2 text-white transition-colors duration-200 hover:text-gray-300"
                 aria-label="Profile"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                <User size={20} weight="regular" />
               </button>
             )}
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="bg-[#1E63EF] hover:bg-[#1750CC] text-white font-bold px-3.5 py-0.5 text-2xl rounded-full transition-all duration-200 transform hover:scale-105"
+              className="font-ui bg-[#1E63EF] hover:bg-[#1750CC] text-white font-medium px-3.5 py-0.5 text-2xl rounded-full transition-all duration-200 transform hover:scale-105"
               aria-label="Toggle menu"
               aria-expanded={isOpen}
             >
@@ -204,9 +213,7 @@ const Navbar = () => {
               onClick={() => setIsOpen(false)}
               className="p-2 text-white hover:text-gray-300 transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X size={24} weight="regular" />
             </button>
           </div>
 
@@ -217,7 +224,7 @@ const Navbar = () => {
                 key={path}
                 to={path}
                 onClick={() => setIsOpen(false)}
-                className="block text-lg text-white transition-colors hover:text-gray-300 py-2"
+                className="font-nav block text-lg text-white/90 transition-colors hover:text-white py-2 font-normal tracking-wide"
               >
                 {label}
               </Link>
@@ -241,19 +248,19 @@ const Navbar = () => {
                     </div>
                   )}
                   <div>
-                    <p className="text-white text-sm font-medium">
+                    <p className="font-ui text-white text-sm font-medium">
                       {customer?.first_name && customer?.last_name 
                         ? `${customer.first_name} ${customer.last_name}`
                         : user.email?.split('@')[0]
                       }
                     </p>
-                    <p className="text-gray-300 text-xs">{user.email}</p>
+                    <p className="font-ui text-gray-300 text-xs font-light">{user.email}</p>
                   </div>
                 </div>
                 {customer && (
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-300">Profile Complete</span>
-                    <span className="text-xs font-bold text-blue-300">
+                    <span className="font-ui text-xs text-gray-300 font-light">Profile Complete</span>
+                    <span className="font-ui text-xs font-semibold text-blue-300">
                       {customer.profile_completion_percentage || 0}%
                     </span>
                   </div>
@@ -262,7 +269,7 @@ const Navbar = () => {
               <Link
                 to="/profile"
                 onClick={() => setIsOpen(false)}
-                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 mb-3"
+                className="font-button block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-3"
               >
                 View Profile
               </Link>
@@ -273,7 +280,7 @@ const Navbar = () => {
               target="_blank" 
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="block w-full text-center bg-[#1E63EF] hover:bg-[#1750CC] text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 mb-6"
+              className="font-button block w-full text-center bg-[#1E63EF] hover:bg-[#1750CC] text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-6"
             >
               Become a Vendor
             </a>
@@ -286,11 +293,9 @@ const Navbar = () => {
                 setIsSearchOverlayOpen(true);
                 setIsOpen(false);
               }}
-              className="flex w-full items-center justify-center rounded-md px-3 py-3 text-white transition-colors hover:bg-white/10 hover:text-gray-300"
+              className="font-ui flex w-full items-center justify-center rounded-md px-3 py-3 text-white/90 transition-colors hover:bg-white/10 hover:text-white font-normal"
             >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <MagnifyingGlass size={20} weight="regular" className="mr-2" />
               Search
             </button>
           )}
@@ -305,27 +310,6 @@ const Navbar = () => {
         />
       )}
 
-      {/* Floating Search Button */}
-      <div
-        className={`fixed left-1/2 transform -translate-x-1/2 z-40 transition-all duration-500 ${
-          showSearchIcon 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 -translate-y-4 pointer-events-none'
-        }`}
-        style={{
-          top: isScrolled ? '72px' : '104px' // Adjust based on navbar height: scrolled (16px + 56px) vs unscrolled (28px + 76px)
-        }}
-      >
-        <button
-          onClick={() => setIsSearchOverlayOpen(true)}
-          className="bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-md hover:from-black/70 hover:to-gray-800/70 text-white hover:text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-white/20"
-          aria-label="Search"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-      </div>
       
       {/* Search Overlay */}
       <SearchOverlay 

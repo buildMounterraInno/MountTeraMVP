@@ -1,17 +1,16 @@
 import { useState, useRef, useEffect, useCallback, Children, isValidElement } from 'react';
-import { Search, Plus, Minus, X } from 'lucide-react';
+import { MagnifyingGlass, X } from 'phosphor-react';
 import { format } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { useNavigate } from 'react-router-dom';
 
-type SearchSection = 'where' | 'date' | 'who' | null;
+type SearchSection = 'where' | 'date' | null;
 type SearchType = 'events-experiences' | 'adventures';
 
 interface SearchData {
   destination: string;
   fromDate?: Date;
-  adults: number;
   searchType: SearchType;
 }
 
@@ -37,7 +36,6 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
   const [searchData, setSearchData] = useState<SearchData>({
     destination: '',
     fromDate: undefined,
-    adults: 0,
     searchType: 'events-experiences',
   });
   const [searchSuggestions, setSearchSuggestions] = useState<SearchResult[]>([]);
@@ -153,9 +151,6 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
     }
     if (searchData.fromDate) {
       searchParams.set('fromDate', format(searchData.fromDate, 'yyyy-MM-dd'));
-    }
-    if (searchData.adults > 0) {
-      searchParams.set('adults', searchData.adults.toString());
     }
     searchParams.set('type', searchData.searchType);
     setIsMobileModalOpen(false);
@@ -282,24 +277,10 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
           />
         </SectionButton>
 
-        <Divider />
-
-        {/* Who */}
-        <SectionButton
-          isActive={activeSection === 'who'}
-          className="ml-2 flex items-center gap-3 rounded-r-full py-3 pr-2 pl-6"
-          onClick={() => handleSectionClick('who')}
-        >
-          <SearchDisplay
-            label="Who"
-            value={
-              searchData.adults > 0
-                ? `${searchData.adults} ${searchData.adults === 1 ? 'guest' : 'guests'}`
-                : 'Add guests'
-            }
-          />
+        {/* Search Button */}
+        <div className="ml-2 flex items-center gap-3 rounded-r-full py-3 pr-2 pl-6">
           <SearchButton onClick={handleSearch} />
-        </SectionButton>
+        </div>
       </div>
 
       {/* Mobile Search Bar */}
@@ -308,18 +289,14 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
           onClick={() => setIsMobileModalOpen(true)}
           className="flex w-full items-center gap-4 rounded-full border border-gray-200 bg-white px-6 py-4 shadow-md"
         >
-          <Search size={20} className="text-gray-600" />
+          <MagnifyingGlass size={20} weight="regular" className="text-gray-600" />
           <div className="flex-1 text-left">
             <p className="text-sm font-medium text-gray-800">Where to?</p>
             <p className="text-xs text-gray-500">
               {searchData.destination || 'Anywhere'} •{' '}
               {searchData.fromDate
                 ? format(searchData.fromDate, 'MMM d')
-                : 'Any date'}{' '}
-              •{' '}
-              {searchData.adults > 0
-                ? `${searchData.adults} guests`
-                : 'Add guests'}
+                : 'Any date'}
             </p>
           </div>
         </button>
@@ -393,18 +370,6 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
                 </div>
               </div>
 
-              {/* Who */}
-              <div className="mb-6">
-                <h3 className="mb-2 text-lg font-semibold">Who's coming?</h3>
-                <div className="rounded-lg border border-gray-300 p-4">
-                  <GuestSelector
-                    adults={searchData.adults}
-                    onChange={(adults) =>
-                      setSearchData((prev) => ({ ...prev, adults }))
-                    }
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Footer */}
@@ -430,9 +395,6 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
             ...prev, 
             fromDate: date || undefined
           }))
-        }
-        onGuestChange={(adults) =>
-          setSearchData((prev) => ({ ...prev, adults }))
         }
       />
 
@@ -560,7 +522,7 @@ const SearchDisplay = ({ label, value }: { label: string; value: string }) => (
 const SearchButton = ({ onClick }: { onClick: () => void }) => {
   const buttonContent = (
     <>
-      <Search size={20} strokeWidth={2.5} />
+      <MagnifyingGlass size={20} weight="regular" />
     </>
   );
 
@@ -583,12 +545,10 @@ const Dropdowns = ({
   activeSection,
   searchData,
   onDateSelect,
-  onGuestChange,
 }: {
   activeSection: SearchSection;
   searchData: SearchData;
   onDateSelect: (date: Date | undefined) => void;
-  onGuestChange: (adults: number) => void;
 }) => {
   const isDatePickerOpen = activeSection === 'date';
 
@@ -627,48 +587,9 @@ const Dropdowns = ({
         </div>
       )}
 
-      {activeSection === 'who' && (
-        <div className="absolute top-[calc(100%+12px)] right-4 z-50 w-[320px] max-w-[calc(100vw-2rem)] rounded-[32px] bg-white p-6 shadow-xl sm:right-0">
-          <GuestSelector adults={searchData.adults} onChange={onGuestChange} />
-        </div>
-      )}
     </>
   );
 };
 
-const GuestSelector = ({
-  adults,
-  onChange,
-}: {
-  adults: number;
-  onChange: (value: number) => void;
-}) => (
-  <div className="flex items-center justify-between py-4">
-    <div>
-      <h3 className="text-base font-medium">Adults</h3>
-      <p className="text-sm text-gray-500">Ages 13 or above</p>
-    </div>
-    <div className="flex items-center gap-3">
-      <button
-        onClick={() => onChange(Math.max(0, adults - 1))}
-        disabled={adults === 0}
-        className={`h-8 w-8 rounded-full border transition-all ${
-          adults === 0
-            ? 'cursor-not-allowed border-gray-200 text-gray-300'
-            : 'border-gray-300 text-gray-600 hover:border-gray-900'
-        }`}
-      >
-        <Minus size={14} className="mx-auto" />
-      </button>
-      <span className="min-w-[3rem] text-center text-base">{adults}</span>
-      <button
-        onClick={() => onChange(adults + 1)}
-        className="h-8 w-8 rounded-full border border-gray-300 text-gray-600 transition-all hover:border-gray-900"
-      >
-        <Plus size={14} className="mx-auto" />
-      </button>
-    </div>
-  </div>
-);
 
 export default SearchBar;

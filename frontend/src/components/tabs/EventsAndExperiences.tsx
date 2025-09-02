@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MapPin } from 'phosphor-react';
 import { NearbyApiService, type LocationCoordinates, type NearbyEventsResponse, type NearbyExperiencesResponse, type NearbyEventItem, type NearbyExperienceItem } from '../../services/nearby-api';
 import EventCard from '../cards/EventCard';
 import ExperienceCard from '../cards/ExperienceCard';
@@ -167,7 +168,10 @@ const EventsAndExperiences = () => {
       {/* Location Info - Debug Panel */}
       {location && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
-          <h3 className="font-semibold text-blue-800 mb-2">📍 Current Location:</h3>
+          <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+            <MapPin size={20} weight="regular" />
+            Current Location:
+          </h3>
           <p className="text-blue-600">
             Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}
           </p>

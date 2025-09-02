@@ -7,7 +7,9 @@
       "Bash(find:*)",
       "Read(C:\\Users\\ASUS\\Desktop\\Codes\\MountTeraMVP/**)",
       "Bash(grep:*)",
-      "Read(C:\\Users\\ASUS\\Desktop\\Codes/**)"
+      "Read(C:\\Users\\ASUS\\Desktop\\Codes/**)",
+      "WebFetch(domain:www.travelperk.com)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "additionalDirectories": [

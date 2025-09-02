@@ -66,8 +66,16 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ customer }) => {
     try {
       await signOut();
       closeDropdown();
-    } catch (error) {
+    } catch (error: any) {
+      // Handle auth session missing error gracefully
+      if (error.message?.includes('Auth session missing') || error.message?.includes('session missing')) {
+        console.log('Session already cleared, closing dropdown');
+        closeDropdown();
+        return;
+      }
       console.error('Sign out error:', error);
+      // Still close dropdown even if there's an error
+      closeDropdown();
     }
   };
 
