@@ -16,15 +16,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('📧 Vercel Function - Received email request:', req.body);
 
-    const { eventName, customerName, customerEmail } = req.body;
+    const { eventName, customerName, customerEmail, eventDate, eventAddress } = req.body;
 
     // Validate required fields
-    if (!eventName || !customerName || !customerEmail) {
+    if (!eventName || !customerName || !customerEmail || !eventDate || !eventAddress) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: eventName, customerName, customerEmail'
+        error: 'Missing required fields: eventName, customerName, customerEmail, eventDate, eventAddress'
       });
     }
 
@@ -47,17 +46,14 @@ export default async function handler(req, res) {
       }],
       template_key: TEMPLATE_ID,
       merge_info: {
-        event_name: eventName,
-        customer_name: customerName,
-        customer_email: customerEmail
+        // Exact template variables
+        name: customerName,
+        "event name": eventName,  // THIS IS THE KEY FIX!
+        date: eventDate,
+        address: eventAddress
       }
     };
 
-    console.log('🚀 Vercel Function - Sending to ZeptoMail:', {
-      to: customerEmail,
-      eventName,
-      templateId: TEMPLATE_ID
-    });
 
     // Call ZeptoMail API
     const response = await fetch(ZEPTO_API_URL, {
@@ -74,7 +70,6 @@ export default async function handler(req, res) {
 
     if (response.ok) {
       const messageId = result.data?.[0]?.additional_info?.[0]?.message_id;
-      console.log('✅ Vercel Function - Email sent successfully:', { messageId, to: customerEmail });
 
       return res.json({
         success: true,
@@ -82,7 +77,6 @@ export default async function handler(req, res) {
         data: result
       });
     } else {
-      console.error('❌ Vercel Function - ZeptoMail error:', result);
       return res.status(400).json({
         success: false,
         error: result.message || result.error || 'Failed to send email'
@@ -90,7 +84,6 @@ export default async function handler(req, res) {
     }
 
   } catch (error) {
-    console.error('❌ Vercel Function - Server error:', error);
     return res.status(500).json({
       success: false,
       error: error.message || 'Internal server error'
