@@ -317,7 +317,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div className="text-center mb-3 sm:mb-4">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900">Create Your Account</h2>
-          <p className="text-gray-600 mt-1 text-xs sm:text-sm">Join Mounterra and start your adventure</p>
+          <p className="text-gray-600 mt-1 text-xs sm:text-sm">Join MountTera and start your adventure</p>
         </div>
 
         {/* Name Fields */}

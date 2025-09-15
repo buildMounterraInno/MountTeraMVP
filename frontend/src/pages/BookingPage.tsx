@@ -916,7 +916,7 @@ const BookingPage: React.FC = () => {
                     <div className="text-center">
                       <div className="text-2xl mb-2">🎉</div>
                       <h3 className="font-bold text-green-800 mb-1">You have successfully registered</h3>
-                      <p className="text-green-700 text-sm">We will intimate you once you are selected.</p>
+                      <p className="text-green-700 text-sm">Please check your email for further details.</p>
                     </div>
                   </div>
                 </div>

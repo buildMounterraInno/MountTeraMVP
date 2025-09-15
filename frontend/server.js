@@ -33,7 +33,7 @@ app.post('/api/send-registration-email', async (req, res) => {
     const emailPayload = {
       from: {
         address: "noreply@trippechalo.in",
-        name: "Trippe Chalo"
+        name: "TrippeChalo"
       },
       to: [{
         email_address: {

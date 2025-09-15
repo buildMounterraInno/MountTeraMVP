@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     const emailPayload = {
       from: {
         address: "noreply@trippechalo.in",
-        name: "Trippe Chalo"
+        name: "TrippeChalo"
       },
       to: [{
         email_address: {
