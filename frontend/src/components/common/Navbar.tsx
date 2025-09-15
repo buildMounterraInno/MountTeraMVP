@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { User, X } from 'phosphor-react';
+import { User} from 'phosphor-react';
 import LoginModal from '../LoginModal';
 import ProfileDropdown from '../ProfileDropdown';
 import { useAuth } from '../../contexts/AuthContext';

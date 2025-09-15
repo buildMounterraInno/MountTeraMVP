@@ -3,12 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   User, 
-  Settings, 
   LogOut, 
   ChevronDown,
   Heart,
   Calendar,
-  HelpCircle
 } from 'lucide-react';
 
 interface Customer {
