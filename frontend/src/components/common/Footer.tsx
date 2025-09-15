@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import footerDecal from '../../assets/footerDecal.svg';
 
 const Footer = () => {
@@ -25,17 +26,21 @@ const Footer = () => {
   };
 
   const footerSections = [
-    {
-      title: 'Company',
-      links: ['About Us', 'Careers', 'Gift Cards', 'Explorer'],
-    },
+    // {
+    //   title: 'Company',
+    //   links: [
+    //     { name: 'About Us', path: '/about-us' },
+    //     { name: 'Careers', path: null },
+    //     { name: 'Gift Cards', path: null },
+    //     { name: 'Explorer', path: null },
+    //   ],
+    // },
     {
       title: 'Support',
       links: [
-        'Contact',
-        'Legal Notice',
-        'Privacy Policy',
-        'Terms and Conditions',
+        { name: 'Legal Notice', path: '/legal-notice' },
+        { name: 'Privacy Policy', path: '/privacy-policy' },
+        { name: 'Terms and Conditions', path: '/terms-and-conditions' },
       ],
     },
   ];
@@ -133,11 +138,20 @@ const Footer = () => {
               <div key={title}>
                 <h3 className="mb-4 font-bold">{title}</h3>
                 <ul className="space-y-2">
-                  {links.map((link) => (
-                    <li key={link} className="text-sm sm:text-base">
-                      <span className="cursor-not-allowed text-white/80">
-                        {link}
-                      </span>
+                  {links.map(({ name, path }) => (
+                    <li key={name} className="text-sm sm:text-base">
+                      {path ? (
+                        <Link
+                          to={path}
+                          className="text-white/80 hover:text-white transition-colors cursor-pointer"
+                        >
+                          {name}
+                        </Link>
+                      ) : (
+                        <span className="cursor-not-allowed text-white/80">
+                          {name}
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MagnifyingGlass, User, X } from 'phosphor-react';
-import SearchOverlay from '../SearchOverlay';
+import { User, X } from 'phosphor-react';
 import LoginModal from '../LoginModal';
 import ProfileDropdown from '../ProfileDropdown';
 import { useAuth } from '../../contexts/AuthContext';
@@ -10,8 +9,6 @@ import { useCustomer } from '../../contexts/CustomerContext';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showSearchIcon, setShowSearchIcon] = useState(false);
-  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const location = useLocation();
   const isLandingPage = location.pathname === '/';
@@ -37,23 +34,15 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
-      
-      // Show search icon when scrolled past hero section on landing page
-      if (isLandingPage) {
-        const heroHeight = window.innerHeight * 0.94; // 94vh from SearchScreen
-        setShowSearchIcon(window.scrollY > heroHeight - 100);
-      } else {
-        setShowSearchIcon(true); // Always show on other pages
-      }
     };
-    
+
     window.addEventListener('scroll', handleScroll);
-    
+
     // Initial check
     handleScroll();
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLandingPage]);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -98,26 +87,14 @@ const Navbar = () => {
 
           {/* Center Section - Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
-            <Link to="/" className="flex items-center">
+            <div className="flex items-center">
               <div className="h-8 w-8 bg-[url('/src/assets/LogoImage.jpg')] bg-contain bg-no-repeat"></div>
               <div className="-ml-1 h-8 w-32 bg-[url('/src/assets/LogoWritten.jpg')] bg-contain bg-no-repeat"></div>
-            </Link>
+            </div>
           </div>
 
           {/* Right Section - Profile & Actions */}
           <div className="flex items-center space-x-4">
-            {/* Search Icon */}
-            <button
-              onClick={() => setIsSearchOverlayOpen(true)}
-              className={`text-white transition-colors duration-200 hover:text-gray-300 transition-all duration-500 ${
-                showSearchIcon 
-                  ? 'opacity-100 scale-100 translate-x-0' 
-                  : 'opacity-0 scale-95 translate-x-2 pointer-events-none'
-              }`}
-              aria-label="Search"
-            >
-              <MagnifyingGlass size={20} weight="regular" />
-            </button>
             {loading || customerLoading ? (
               <div className="w-8 h-8 animate-pulse bg-white/20 rounded-full"></div>
             ) : user ? (
@@ -152,10 +129,10 @@ const Navbar = () => {
       <div className={`${glassClasses} py-2 md:hidden w-full`}>
         <div className="flex items-center justify-between px-4">
           {/* Mobile Logo */}
-          <Link to="/" className="flex items-center">
+          <div className="flex items-center">
             <div className="h-8 w-8 bg-[url('/src/assets/LogoImage.jpg')] bg-contain bg-no-repeat"></div>
             <div className="-ml-1 h-8 w-32 bg-[url('/src/assets/LogoWritten.jpg')] bg-contain bg-no-repeat"></div>
-          </Link>
+          </div>
 
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-1">
@@ -185,40 +162,34 @@ const Navbar = () => {
               </button>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Hamburger */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="font-ui bg-[#1E63EF] hover:bg-[#1750CC] text-white font-medium px-3.5 py-0.5 text-2xl rounded-full transition-all duration-200 transform hover:scale-105"
+              className="p-2 text-white transition-colors duration-200 hover:text-gray-300"
               aria-label="Toggle menu"
               aria-expanded={isOpen}
             >
-              {isOpen ? '✕' : '+'}
+              <div className="w-6 h-6 flex flex-col justify-center space-y-1">
+                <div className={`w-6 h-0.5 bg-white transition-all duration-200 ${isOpen ? 'rotate-45 translate-y-1.5' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-white transition-all duration-200 ${isOpen ? 'opacity-0' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-white transition-all duration-200 ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
+              </div>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu - Slide from Right */}
+      {/* Mobile Menu - Dropdown from Header */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] md:hidden ${glassClasses} transform shadow-xl transition-all duration-300 z-50 ${
+        className={`fixed left-0 right-0 md:hidden ${glassClasses} border-t border-white/10 shadow-xl transition-all duration-300 z-40 ${
           isOpen
-            ? 'translate-x-0'
-            : 'translate-x-full'
+            ? 'top-[52px] opacity-100 visible'
+            : 'top-[52px] opacity-0 invisible'
         }`}
       >
-        <div className="p-6">
-          {/* Close Button */}
-          <div className="flex justify-end mb-8">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-2 text-white hover:text-gray-300 transition-colors"
-            >
-              <X size={24} weight="regular" />
-            </button>
-          </div>
-
+        <div className="px-4 py-6 text-center">
           {/* Navigation Links */}
-          <nav className="space-y-4 mb-8">
+          <nav className="space-y-4 mb-6">
             {navLinks.map(({ path, label }) => (
               <Link
                 key={path}
@@ -231,11 +202,12 @@ const Navbar = () => {
             ))}
           </nav>
 
-          {/* User Actions */}
+
+          {/* User Profile Section */}
           {user ? (
-            <div className="mb-6">
+            <div className="mb-4">
               <div className="mb-4 p-4 bg-white/10 rounded-lg">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center justify-center gap-3 mb-2">
                   {customer?.avatar_url ? (
                     <img
                       src={customer.avatar_url}
@@ -257,7 +229,7 @@ const Navbar = () => {
                   </div>
                 </div>
                 {customer && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center gap-2">
                     <span className="font-ui text-xs text-gray-300 font-light">Profile Complete</span>
                     <span className="font-ui text-xs font-semibold text-blue-300">
                       {customer.profile_completion_percentage || 0}%
@@ -272,31 +244,35 @@ const Navbar = () => {
               >
                 View Profile
               </Link>
+              <Link
+                to="/my-bookings"
+                onClick={() => setIsOpen(false)}
+                className="font-button block w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-full transition-all duration-200"
+              >
+                My Bookings
+              </Link>
             </div>
           ) : (
-            <a 
-              href="https://tpc-vendor-in-dev.vercel.app/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
-              className="font-button block w-full text-center bg-[#1E63EF] hover:bg-[#1750CC] text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-6"
-            >
-              Become a Vendor
-            </a>
-          )}
-
-          {/* Mobile Search Icon */}
-          {showSearchIcon && (
-            <button
-              onClick={() => {
-                setIsSearchOverlayOpen(true);
-                setIsOpen(false);
-              }}
-              className="font-ui flex w-full items-center justify-center rounded-md px-3 py-3 text-white/90 transition-colors hover:bg-white/10 hover:text-white font-normal"
-            >
-              <MagnifyingGlass size={20} weight="regular" className="mr-2" />
-              Search
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  setIsLoginModalOpen(true);
+                  setIsOpen(false);
+                }}
+                className="font-button block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-full transition-all duration-200"
+              >
+                Sign In
+              </button>
+              <a
+                href="https://vendor.trippechalo.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsOpen(false)}
+                className="font-button block w-full text-center bg-[#1E63EF] hover:bg-[#1750CC] text-white font-medium px-6 py-3 rounded-full transition-all duration-200"
+              >
+                Become a Vendor
+              </a>
+            </div>
           )}
         </div>
       </div>
@@ -304,17 +280,11 @@ const Navbar = () => {
       {/* Mobile Menu Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 md:hidden z-40"
+          className="fixed inset-0 bg-black/30 md:hidden z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      
-      {/* Search Overlay */}
-      <SearchOverlay 
-        isOpen={isSearchOverlayOpen} 
-        onClose={() => setIsSearchOverlayOpen(false)} 
-      />
 
       {/* Login Modal */}
       <LoginModal 

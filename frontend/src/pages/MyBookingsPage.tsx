@@ -285,7 +285,17 @@ const MyBookingsPage: React.FC = () => {
                         </div>
 
                         <div className="flex-shrink-0">
-                          {getStatusBadge(booking.is_approved)}
+                          <div className="text-right">
+                            {getStatusBadge(booking.is_approved)}
+                            {booking.is_approved === true && (
+                              <div className="mt-2">
+                                <p className="text-sm font-medium text-green-700 mb-1">🎉 You're selected!</p>
+                                <p className="text-xs text-gray-600 max-w-48 lg:max-w-none">
+                                  View details to complete payment process
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 

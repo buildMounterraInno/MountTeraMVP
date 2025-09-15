@@ -171,25 +171,25 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       />
       
       {/* Modal */}
-      <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
+      <div className={`fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 ${
         isClosing ? 'animate-fade-out' : 'animate-fade-in'
       }`}>
         <div className={`relative w-full ${
-          isSignUp ? 'max-w-2xl max-h-[90vh] overflow-hidden' : 'max-w-md'
-        } bg-white rounded-2xl shadow-2xl transform transition-all duration-200 ${
+          isSignUp ? 'max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden' : 'max-w-md'
+        } bg-white rounded-xl sm:rounded-2xl shadow-2xl transform transition-all duration-200 ${
           isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
         }`}>
           {/* Close Button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 z-10"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 z-10 touch-manipulation"
             aria-label="Close modal"
           >
             <X size={20} />
           </button>
 
           {/* Modal Content */}
-          <div className={`${isSignUp ? 'p-6' : 'p-8'} ${isSignUp ? 'max-h-[90vh] overflow-y-auto' : ''}`}>
+          <div className={`${isSignUp ? 'p-4 sm:p-6' : 'p-6 sm:p-8'} ${isSignUp ? 'max-h-[95vh] sm:max-h-[90vh] overflow-y-auto' : ''}`}>
             {/* Render SignupForm for signup */}
             {isSignUp ? (
               <SignupForm 
@@ -199,7 +199,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             ) : (
               <>
                 {/* Title */}
-                <h2 className="font-tpc text-2xl font-bold text-gray-800 text-center mb-6">
+                <h2 className="font-tpc text-xl sm:text-2xl font-bold text-gray-800 text-center mb-4 sm:mb-6">
                   {showForgotPassword ? 'Reset Password' : 'Login'}
                 </h2>
 
@@ -215,10 +215,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                   Email Address
                 </label>
                 <input
@@ -226,7 +226,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#1E63EF] focus:border-transparent outline-none transition-all duration-200 ${
+                  className={`w-full px-3 sm:px-4 py-3 sm:py-3 border rounded-lg focus:ring-2 focus:ring-[#1E63EF] focus:border-transparent outline-none transition-all duration-200 text-base ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Enter your email"
@@ -249,7 +249,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                       id="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-[#1E63EF] focus:border-transparent outline-none transition-all duration-200 ${
+                      className={`w-full px-3 sm:px-4 py-3 pr-11 sm:pr-12 border rounded-lg focus:ring-2 focus:ring-[#1E63EF] focus:border-transparent outline-none transition-all duration-200 text-base ${
                         errors.password ? 'border-red-300' : 'border-gray-300'
                       }`}
                       placeholder="Enter your password"
@@ -258,7 +258,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 touch-manipulation"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -299,7 +299,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#1E63EF] hover:bg-[#E31E56] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
+                className="w-full bg-[#1E63EF] hover:bg-[#E31E56] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 touch-manipulation text-base"
               >
                 {loading ? 'Loading...' : showForgotPassword ? 'Send Reset Email' : 'Login'}
               </button>
@@ -330,13 +330,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </button> */}
 
                 {/* Toggle Login/Signup - Hide for forgot password */}
-                <div className="text-center mt-6">
+                <div className="text-center mt-4 sm:mt-6">
                   <p className="text-sm text-gray-600">
                     Don't have an account?{' '}
                     <button
                       type="button"
                       onClick={() => setIsSignUp(true)}
-                      className="text-[#1E63EF] hover:text-[#E31E56] font-medium transition-colors duration-200"
+                      className="text-[#1E63EF] hover:text-[#E31E56] font-medium transition-colors duration-200 touch-manipulation"
                     >
                       Create Account
                     </button>

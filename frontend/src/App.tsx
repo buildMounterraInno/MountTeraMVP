@@ -18,6 +18,9 @@ import ProfilePage from './pages/ProfilePage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import BookingPage from './pages/BookingPage';
 import EmailTestPage from './pages/EmailTestPage';
+import TermsAndConditions from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import LegalNotice from './pages/LegalNotice';
 import AuthCallback from './components/AuthCallback';
 import ScrollToTop from './components/common/ScrollToTop';
 
@@ -38,6 +41,9 @@ function App() {
           <Route path="/article" element={<Articles />} />
           <Route path="/article/:slug" element={<ArticlePage />} />
           <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/legal-notice" element={<LegalNotice />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-bookings" element={<MyBookingsPage />} />
           <Route path="/booking/:type/:id" element={<BookingPage />} />

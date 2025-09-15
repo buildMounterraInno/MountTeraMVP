@@ -117,18 +117,6 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ customer }) => {
       label: 'My Bookings',
       path: '/my-bookings',
       description: 'View and manage your trek bookings'
-    },
-    {
-      icon: Settings,
-      label: 'Settings',
-      path: '/settings',
-      description: 'Account preferences and settings'
-    },
-    {
-      icon: HelpCircle,
-      label: 'Help & Support',
-      path: '/support',
-      description: 'Get help and contact support'
     }
   ];
 
@@ -152,14 +140,6 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ customer }) => {
             <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold border-2 border-white/30">
               {getInitials()}
             </div>
-          )}
-          
-          {/* Online indicator */}
-          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-          
-          {/* Onboarding indicator */}
-          {!customer?.onboarding_completed && (
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></div>
           )}
         </div>
 

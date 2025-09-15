@@ -10,7 +10,9 @@
       "Read(C:\\Users\\ASUS\\Desktop\\Codes/**)",
       "WebFetch(domain:www.travelperk.com)",
       "Bash(npm run dev:*)",
-      "Bash(npm run server:*)"
+      "Bash(npm run server:*)",
+      "WebFetch(domain:docs.google.com)",
+      "Read(//c/Users/ASUS/Downloads/**)"
     ],
     "deny": [],
     "additionalDirectories": [

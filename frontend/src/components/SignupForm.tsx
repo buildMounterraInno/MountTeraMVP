@@ -313,17 +313,17 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
   };
 
   return (
-    <div className="max-h-[80vh] overflow-y-auto">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="text-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Create Your Account</h2>
-          <p className="text-gray-600 mt-1 text-sm">Join MountTera and start your adventure</p>
+    <div className="max-h-[95vh] sm:max-h-[80vh] overflow-y-auto">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+        <div className="text-center mb-3 sm:mb-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Create Your Account</h2>
+          <p className="text-gray-600 mt-1 text-xs sm:text-sm">Join Mounterra and start your adventure</p>
         </div>
 
         {/* Name Fields */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               First Name <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -332,7 +332,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
                 type="text"
                 value={formData.first_name}
                 onChange={(e) => handleInputChange('first_name', e.target.value)}
-                className={`w-full pl-9 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                className={`w-full pl-8 sm:pl-9 pr-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                   errors.first_name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="First name"
@@ -340,12 +340,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
               />
             </div>
             {errors.first_name && (
-              <p className="text-red-500 text-xs mt-1">{errors.first_name}</p>
+              <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.first_name}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Last Name <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -354,7 +354,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
                 type="text"
                 value={formData.last_name}
                 onChange={(e) => handleInputChange('last_name', e.target.value)}
-                className={`w-full pl-9 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                className={`w-full pl-8 sm:pl-9 pr-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                   errors.last_name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Last name"
@@ -362,14 +362,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
               />
             </div>
             {errors.last_name && (
-              <p className="text-red-500 text-xs mt-1">{errors.last_name}</p>
+              <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.last_name}</p>
             )}
           </div>
         </div>
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
             Email Address <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -378,7 +378,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className={`w-full pl-9 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+              className={`w-full pl-8 sm:pl-9 pr-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="your@email.com"
@@ -386,13 +386,13 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
             />
           </div>
           {errors.email && (
-            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.email}</p>
           )}
         </div>
 
         {/* Phone Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
             Phone Number
           </label>
           <div className="relative">
@@ -401,7 +401,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
               type="tel"
               value={formData.phone_number}
               onChange={(e) => handleInputChange('phone_number', e.target.value)}
-              className={`w-full pl-9 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+              className={`w-full pl-8 sm:pl-9 pr-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                 errors.phone_number ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Phone number (optional)"
@@ -409,20 +409,20 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
             />
           </div>
           {errors.phone_number && (
-            <p className="text-red-500 text-xs mt-1">{errors.phone_number}</p>
+            <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.phone_number}</p>
           )}
         </div>
 
         {/* Gender and Date of Birth */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Gender <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.gender}
               onChange={(e) => handleInputChange('gender', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+              className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                 errors.gender ? 'border-red-500' : 'border-gray-300'
               }`}
               disabled={isLoading}
@@ -434,12 +434,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
               <option value="prefer_not_to_say">Prefer not to say</option>
             </select>
             {errors.gender && (
-              <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+              <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.gender}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Date of Birth <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -448,21 +448,21 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
                 type="date"
                 value={formData.date_of_birth}
                 onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-                className={`w-full pl-9 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                className={`w-full pl-8 sm:pl-9 pr-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                   errors.date_of_birth ? 'border-red-500' : 'border-gray-300'
                 }`}
                 disabled={isLoading}
               />
             </div>
             {errors.date_of_birth && (
-              <p className="text-red-500 text-xs mt-1">{errors.date_of_birth}</p>
+              <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.date_of_birth}</p>
             )}
           </div>
         </div>
 
         {/* Password */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
             Password <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -471,7 +471,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
               type={showPassword ? 'text' : 'password'}
               value={formData.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
-              className={`w-full pl-9 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+              className={`w-full pl-8 sm:pl-9 pr-10 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter password"
@@ -480,20 +480,20 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 hover:text-gray-600 touch-manipulation"
               disabled={isLoading}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           {errors.password && (
-            <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.password}</p>
           )}
         </div>
 
         {/* Confirm Password */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
             Confirm Password <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -502,7 +502,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
               type={showConfirmPassword ? 'text' : 'password'}
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-              className={`w-full pl-9 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+              className={`w-full pl-8 sm:pl-9 pr-10 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
                 errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Confirm password"
@@ -511,14 +511,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 hover:text-gray-600 touch-manipulation"
               disabled={isLoading}
             >
               {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+            <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.confirmPassword}</p>
           )}
         </div>
 
@@ -542,7 +542,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 sm:py-2.5 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
         >
           {isLoading ? (
             <>
@@ -555,13 +555,13 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
         </button>
 
         {/* Switch to Login */}
-        <div className="text-center pt-3">
-          <p className="text-gray-600 text-sm">
+        <div className="text-center pt-2 sm:pt-3">
+          <p className="text-gray-600 text-xs sm:text-sm">
             Already have an account?{' '}
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-blue-600 hover:text-blue-700 font-medium touch-manipulation"
               disabled={isLoading}
             >
               Sign In

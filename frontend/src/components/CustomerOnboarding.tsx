@@ -530,7 +530,7 @@ const CustomerOnboarding: React.FC<CustomerOnboardingProps> = ({
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Welcome to MountTera!</h1>
+              <h1 className="text-2xl font-bold">Welcome to Mounterra!</h1>
               <p className="text-blue-100 mt-1">Let's set up your adventure profile</p>
             </div>
             <button
