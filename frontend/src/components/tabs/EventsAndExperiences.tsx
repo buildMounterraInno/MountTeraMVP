@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'phosphor-react';
 import { NearbyApiService, type LocationCoordinates, type NearbyEventsResponse, type NearbyExperiencesResponse, type NearbyEventItem, type NearbyExperienceItem } from '../../services/nearby-api';
 import EventCard from '../cards/EventCard';
@@ -7,7 +6,6 @@ import ExperienceCard from '../cards/ExperienceCard';
 import CardCarousel from '../ui/CardCarousel';
 
 const EventsAndExperiences = () => {
-  const navigate = useNavigate();
   const [location, setLocation] = useState<LocationCoordinates | null>(null);
   const [eventsData, setEventsData] = useState<NearbyEventsResponse | null>(null);
   const [experiencesData, setExperiencesData] = useState<NearbyExperiencesResponse | null>(null);
@@ -48,11 +46,11 @@ const EventsAndExperiences = () => {
   }, []);
 
   const handleEventCardClick = (eventId: string) => {
-    navigate(`/booking/event/${eventId}`);
+    window.open(`/booking/event/${eventId}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleExperienceCardClick = (experienceId: string) => {
-    navigate(`/booking/experience/${experienceId}`);
+    window.open(`/booking/experience/${experienceId}`, '_blank', 'noopener,noreferrer');
   };
 
   if (loading) {

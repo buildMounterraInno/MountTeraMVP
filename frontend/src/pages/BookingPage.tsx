@@ -305,11 +305,31 @@ const BookingPage: React.FC = () => {
 
       // Send confirmation email via ZeptoMail
       try {
-        console.log('📧 Sending registration confirmation email...');
+        console.log('📧 Sending registration confirmation email with all fields...');
+        // Format date for email
+        const eventDate = eventDetails?.date
+          ? new Date(eventDetails.date).toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })
+          : 'Date to be announced';
+
+        // Format full address for email
+        const eventAddress = [
+          eventDetails?.address_venue,
+          eventDetails?.address_city,
+          eventDetails?.address_landmark,
+          eventDetails?.address_full_address
+        ].filter(Boolean).join(', ') || 'Address to be announced';
+
         const emailResult = await ZeptoMailService.sendRegistrationEmail({
           eventName: eventDetails?.event_name || 'Event Registration',
           customerName: personalDetails.name,
           customerEmail: personalDetails.email,
+          eventDate,
+          eventAddress,
         });
 
         if (emailResult.success) {
@@ -746,6 +766,16 @@ const BookingPage: React.FC = () => {
                   <div className="p-6 bg-gray-50 rounded-xl border border-gray-100">
                     <h3 className="font-semibold text-black mb-2 text-sm uppercase tracking-wide text-gray-500">Duration</h3>
                     <p className="text-gray-900 font-medium">{eventDetails.duration} hours</p>
+                  </div>
+                )}
+                {((type === 'event' && eventDetails.contact_number) || (type === 'experience' && eventDetails.emergency_contact_number)) && (
+                  <div className="p-6 bg-gray-50 rounded-xl border border-gray-100">
+                    <h3 className="font-semibold text-black mb-2 text-sm uppercase tracking-wide text-gray-500">
+                      {type === 'event' ? 'Contact Number' : 'Emergency Contact'}
+                    </h3>
+                    <p className="text-gray-900 font-medium break-words">
+                      {type === 'event' ? eventDetails.contact_number : eventDetails.emergency_contact_number}
+                    </p>
                   </div>
                 )}
               </div>

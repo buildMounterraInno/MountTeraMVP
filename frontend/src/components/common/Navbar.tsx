@@ -12,7 +12,7 @@ const Navbar = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const location = useLocation();
   const isLandingPage = location.pathname === '/';
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { customer, loading: customerLoading } = useCustomer();
 
   // Navigation data
@@ -247,10 +247,23 @@ const Navbar = () => {
               <Link
                 to="/my-bookings"
                 onClick={() => setIsOpen(false)}
-                className="font-button block w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-full transition-all duration-200"
+                className="font-button block w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-3"
               >
                 My Bookings
               </Link>
+              <button
+                onClick={async () => {
+                  try {
+                    await signOut();
+                    setIsOpen(false);
+                  } catch (error) {
+                    console.error('Error signing out:', error);
+                  }
+                }}
+                className="font-button block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded-full transition-all duration-200"
+              >
+                Sign Out
+              </button>
             </div>
           ) : (
             <div className="space-y-3">

@@ -12,7 +12,9 @@
       "Bash(npm run dev:*)",
       "Bash(npm run server:*)",
       "WebFetch(domain:docs.google.com)",
-      "Read(//c/Users/ASUS/Downloads/**)"
+      "Read(//c/Users/ASUS/Downloads/**)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "additionalDirectories": [

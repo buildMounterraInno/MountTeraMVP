@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { treks, Trek } from '../data/trek';
 import { events, Event } from '../data/events';
 import { experiences, Experience } from '../data/experience';
@@ -390,7 +390,7 @@ const SearchResults = () => {
                   if (viewMode === 'grid') {
                     // Grid Card View - Match EventCard/ExperienceCard design exactly
                     return (
-                      <Link key={`${item.type}-${item.id}`} to={targetUrl} target="_blank" rel="noopener noreferrer">
+                      <a key={`${item.type}-${item.id}`} href={targetUrl} target="_blank" rel="noopener noreferrer">
                         <div className="w-80 h-[400px] bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-[1.02] flex-shrink-0 flex flex-col">
                           {/* Banner Image - Top */}
                           <div className="h-56 relative overflow-hidden rounded-2xl m-4 mb-2 flex-shrink-0">
@@ -471,12 +471,12 @@ const SearchResults = () => {
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </a>
                     );
                   } else {
                     // List View
                     return (
-                      <Link key={`${item.type}-${item.id}`} to={targetUrl} target="_blank" rel="noopener noreferrer">
+                      <a key={`${item.type}-${item.id}`} href={targetUrl} target="_blank" rel="noopener noreferrer">
                         <div className="bg-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-5 cursor-pointer group border border-gray-100">
                           <div className="flex gap-6">
                             <div className="relative w-36 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
@@ -528,7 +528,7 @@ const SearchResults = () => {
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </a>
                     );
                   }
                 })}
@@ -548,7 +548,7 @@ const SearchResults = () => {
                       const targetUrl = item.url || `/booking/${item.type}/${item.id}`;
 
                       return hasUrl ? (
-                        <Link key={`${item.type}-${item.id}`} to={targetUrl} target="_blank" rel="noopener noreferrer">
+                        <a key={`${item.type}-${item.id}`} href={targetUrl} target="_blank" rel="noopener noreferrer">
                           <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden cursor-pointer group">
                             <div className="relative h-48 overflow-hidden">
                               <img 
@@ -591,7 +591,7 @@ const SearchResults = () => {
                               </div>
                             </div>
                           </div>
-                        </Link>
+                        </a>
                       ) : (
                         <div key={`${item.type}-${item.id}`}>
                           {/* Non-clickable fallback */}

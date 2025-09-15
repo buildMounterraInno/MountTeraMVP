@@ -15,12 +15,14 @@ interface RegistrationEmailData {
   eventName: string;
   customerName: string;
   customerEmail: string;
+  eventDate: string;
+  eventAddress: string;
 }
 
 export class ZeptoMailService {
   // Use local backend server for development, Vercel API for production
   private static readonly BACKEND_EMAIL_API = import.meta.env.MODE === 'development'
-    ? 'http://localhost:3001'
+    ? 'http://localhost:3002'
     : window.location.origin; // Uses same domain as frontend in production
 
   /**
@@ -32,14 +34,10 @@ export class ZeptoMailService {
         eventName: data.eventName,
         customerName: data.customerName,
         customerEmail: data.customerEmail,
+        eventDate: data.eventDate,
+        eventAddress: data.eventAddress,
       };
 
-      console.log('📧 Sending registration email via backend API:', {
-        to: data.customerEmail,
-        eventName: data.eventName,
-        customerName: data.customerName,
-        api: this.BACKEND_EMAIL_API,
-      });
 
       const response = await fetch(`${this.BACKEND_EMAIL_API}/api/send-registration-email`, {
         method: 'POST',
@@ -89,6 +87,8 @@ export class ZeptoMailService {
       eventName: 'Test Event - Hampta Pass Trek',
       customerName: 'Test User',
       customerEmail: testEmail,
+      eventDate: 'December 15, 2024',
+      eventAddress: 'Manali Base Camp, Himachal Pradesh, India - 175131',
     });
   }
 }

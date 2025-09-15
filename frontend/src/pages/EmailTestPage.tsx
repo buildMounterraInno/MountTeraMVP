@@ -7,7 +7,9 @@ const EmailTestPage: React.FC = () => {
   const [formData, setFormData] = useState({
     eventName: 'Hampta Pass Trek - Test Event',
     customerName: 'John Doe',
-    customerEmail: 'rajvaidhyag@gmail.com'
+    customerEmail: 'rajvaidhyag@gmail.com',
+    eventDate: 'Monday, December 15, 2024',
+    eventAddress: 'Manali Base Camp, Himachal Pradesh, Near Mall Road, 175131'
   });
 
   const handleTestEmail = async () => {
@@ -56,7 +58,7 @@ const EmailTestPage: React.FC = () => {
               <h3 className="font-semibold text-blue-900 mb-2">Template Configuration</h3>
               <div className="text-sm text-blue-800 space-y-1">
                 <p><strong>Template ID:</strong> 2518b.623682b2828bdc79.k1.54307f80-9085-11f0-a4b7-d2cf08f4ca8c.19942703f78</p>
-                <p><strong>Variables:</strong> event_name, customer_name, customer_email</p>
+                <p><strong>Variables:</strong> name, event_name, date, address</p>
                 <p><strong>From:</strong> noreply@trippechalo.in</p>
               </div>
             </div>
@@ -92,6 +94,28 @@ const EmailTestPage: React.FC = () => {
                   value={formData.customerEmail}
                   onChange={(e) => setFormData(prev => ({ ...prev, customerEmail: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
+                <input
+                  type="text"
+                  value={formData.eventDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, eventDate: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., Monday, December 15, 2024"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Event Address</label>
+                <textarea
+                  value={formData.eventAddress}
+                  onChange={(e) => setFormData(prev => ({ ...prev, eventAddress: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., Manali Base Camp, Himachal Pradesh, Near Mall Road, 175131"
+                  rows={2}
                 />
               </div>
 

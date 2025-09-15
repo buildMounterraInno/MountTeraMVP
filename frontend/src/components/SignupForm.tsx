@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Phone, 
-  Calendar,
-  Eye, 
+import {
+  User,
+  Mail,
+  Lock,
+  Phone,
+  Eye,
   EyeOff,
   AlertCircle,
   Loader,
@@ -21,7 +20,6 @@ interface SignupFormData {
   last_name: string;
   phone_number: string;
   gender: string;
-  date_of_birth: string;
 }
 
 interface SignupFormProps {
@@ -37,8 +35,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
     first_name: '',
     last_name: '',
     phone_number: '',
-    gender: '',
-    date_of_birth: ''
+    gender: ''
   });
   
   const [showPassword, setShowPassword] = useState(false);
@@ -98,26 +95,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
       newErrors.gender = 'Please select your gender';
     }
 
-    // Date of birth validation
-    if (!formData.date_of_birth) {
-      newErrors.date_of_birth = 'Date of birth is required';
-    } else {
-      const birthDate = new Date(formData.date_of_birth);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      
-      // Adjust age if birthday hasn't occurred this year
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      
-      if (age < 13) {
-        newErrors.date_of_birth = 'You must be at least 13 years old';
-      } else if (age > 120) {
-        newErrors.date_of_birth = 'Please enter a valid date of birth';
-      }
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -201,7 +178,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
                     last_name: formData.last_name,
                     phone_number: formData.phone_number || undefined,
                     gender: formData.gender,
-                    date_of_birth: formData.date_of_birth,
                     profile_completion_percentage: 100
                   }, existingSession.user.id); // Pass the user ID directly
 
@@ -268,7 +244,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
             last_name: formData.last_name,
             phone_number: formData.phone_number || undefined,
             gender: formData.gender,
-            date_of_birth: formData.date_of_birth,
             profile_completion_percentage: 100
           }, data.user.id); // Pass the user ID directly
 
@@ -413,51 +388,28 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
           )}
         </div>
 
-        {/* Gender and Date of Birth */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Gender <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.gender}
-              onChange={(e) => handleInputChange('gender', e.target.value)}
-              className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
-                errors.gender ? 'border-red-500' : 'border-gray-300'
-              }`}
-              disabled={isLoading}
-            >
-              <option value="">Select gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-              <option value="prefer_not_to_say">Prefer not to say</option>
-            </select>
-            {errors.gender && (
-              <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.gender}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Date of Birth <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-              <input
-                type="date"
-                value={formData.date_of_birth}
-                onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-                className={`w-full pl-8 sm:pl-9 pr-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
-                  errors.date_of_birth ? 'border-red-500' : 'border-gray-300'
-                }`}
-                disabled={isLoading}
-              />
-            </div>
-            {errors.date_of_birth && (
-              <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.date_of_birth}</p>
-            )}
-          </div>
+        {/* Gender */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+            Gender <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={formData.gender}
+            onChange={(e) => handleInputChange('gender', e.target.value)}
+            className={`w-full px-3 py-2.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+              errors.gender ? 'border-red-500' : 'border-gray-300'
+            }`}
+            disabled={isLoading}
+          >
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+            <option value="prefer_not_to_say">Prefer not to say</option>
+          </select>
+          {errors.gender && (
+            <p className="text-red-500 text-xs mt-0.5 sm:mt-1">{errors.gender}</p>
+          )}
         </div>
 
         {/* Password */}

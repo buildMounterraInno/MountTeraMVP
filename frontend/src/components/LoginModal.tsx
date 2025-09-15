@@ -89,7 +89,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                      error.message.toLowerCase().includes('invalid email or password') ||
                      error.message.toLowerCase().includes('incorrect password') ||
                      error.message.toLowerCase().includes('wrong password')) {
-            setErrors({ password: 'Invalid email or password. Please check your credentials.' });
+            setErrors({ password: 'Invalid email or password. Please check your credentials or create a new account.' });
           } else if (error.message.toLowerCase().includes('email not confirmed') || 
                      error.message.toLowerCase().includes('email not verified')) {
             setErrors({ email: 'Please check your email and click the confirmation link before logging in.' });

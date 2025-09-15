@@ -1,5 +1,4 @@
 import { type Trek, treks } from '../../data/trek.ts';
-import { Link } from 'react-router-dom';
 
 const TrekTile: React.FC<Trek> = ({
   destinationImage,
@@ -9,7 +8,7 @@ const TrekTile: React.FC<Trek> = ({
   pageUrl,
 }) => {
   return (
-    <Link to={pageUrl} className="block">
+    <a href={pageUrl} target="_blank" rel="noopener noreferrer" className="block">
       <article
         className="relative h-50 overflow-hidden rounded-lg bg-cover bg-center p-4 text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:ring-2 hover:ring-[#F2F2F2]/50"
         style={{ backgroundImage: `url(${destinationImage})` }}
@@ -29,7 +28,7 @@ const TrekTile: React.FC<Trek> = ({
           <p className="text-sm text-white/80">{coordinates}</p>
         </div>
       </article>
-    </Link>
+    </a>
   );
 };
 

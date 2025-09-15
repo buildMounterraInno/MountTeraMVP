@@ -3,7 +3,7 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 
 const app = express();
-const PORT = 3001;
+const PORT = 3002;
 
 // Middleware
 app.use(cors());
@@ -17,15 +17,14 @@ const TEMPLATE_ID = '2518b.623682b2828bdc79.k1.54307f80-9085-11f0-a4b7-d2cf08f4c
 // Email sending endpoint
 app.post('/api/send-registration-email', async (req, res) => {
   try {
-    console.log('📧 Received email request:', req.body);
 
-    const { eventName, customerName, customerEmail } = req.body;
+    const { eventName, customerName, customerEmail, eventDate, eventAddress } = req.body;
 
     // Validate required fields
-    if (!eventName || !customerName || !customerEmail) {
+    if (!eventName || !customerName || !customerEmail || !eventDate || !eventAddress) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: eventName, customerName, customerEmail'
+        error: 'Missing required fields: eventName, customerName, customerEmail, eventDate, eventAddress'
       });
     }
 
@@ -43,17 +42,14 @@ app.post('/api/send-registration-email', async (req, res) => {
       }],
       template_key: TEMPLATE_ID,
       merge_info: {
-        event_name: eventName,
-        customer_name: customerName,
-        customer_email: customerEmail
+        // Exact template variables
+        name: customerName,
+        "event name": eventName,  // THIS IS THE KEY FIX!
+        date: eventDate,
+        address: eventAddress
       }
     };
 
-    console.log('🚀 Sending to ZeptoMail:', {
-      to: customerEmail,
-      eventName,
-      templateId: TEMPLATE_ID
-    });
 
     // Call ZeptoMail API
     const response = await fetch(ZEPTO_API_URL, {
@@ -70,7 +66,6 @@ app.post('/api/send-registration-email', async (req, res) => {
 
     if (response.ok) {
       const messageId = result.data?.[0]?.additional_info?.[0]?.message_id;
-      console.log('✅ Email sent successfully:', { messageId, to: customerEmail });
 
       res.json({
         success: true,
@@ -78,7 +73,6 @@ app.post('/api/send-registration-email', async (req, res) => {
         data: result
       });
     } else {
-      console.error('❌ ZeptoMail error:', result);
       res.status(400).json({
         success: false,
         error: result.message || result.error || 'Failed to send email'
@@ -86,7 +80,6 @@ app.post('/api/send-registration-email', async (req, res) => {
     }
 
   } catch (error) {
-    console.error('❌ Server error:', error);
     res.status(500).json({
       success: false,
       error: error.message || 'Internal server error'
