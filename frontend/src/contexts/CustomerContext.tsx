@@ -23,7 +23,7 @@ interface CustomerContextType {
   customer: Customer | null;
   loading: boolean;
   error: string | null;
-  createCustomer: (customerData: Partial<Customer>) => Promise<Customer>;
+  createCustomer: (customerData: Partial<Customer>, authUserId?: string) => Promise<Customer>;
   updateCustomer: (updates: Partial<Customer>) => Promise<Customer>;
   refreshCustomer: () => Promise<void>;
   calculateCompletionPercentage: (customer: Customer) => number;
@@ -94,12 +94,12 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
       setError(null);
 
       const { data, error: fetchError } = await supabase
-        .from('customers')
+        .from('customer')
         .select('*')
-        .eq('auth_user_id', user.id)
-        .single();
+        .eq('id', user.id)
+        .maybeSingle();
 
-      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (fetchError) {
         throw fetchError;
       }
 
@@ -110,11 +110,11 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
         // Update completion percentage if it's different
         if (data.profile_completion_percentage !== completionPercentage) {
           const { data: updatedData } = await supabase
-            .from('customers')
+            .from('customer')
             .update({ profile_completion_percentage: completionPercentage })
             .eq('id', data.id)
             .select()
-            .single();
+            .maybeSingle();
           
           if (updatedData) {
             setCustomer(updatedData);
@@ -125,6 +125,7 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
           setCustomer(data);
         }
       } else {
+        // No customer profile found - this might be an orphaned auth user
         setCustomer(null);
       }
     } catch (err) {
@@ -139,6 +140,7 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
   // Create new customer record
   const createCustomer = async (customerData: Partial<Customer>, authUserId?: string): Promise<Customer> => {
     const userId = authUserId || user?.id;
+
     if (!userId) {
       throw new Error('User not authenticated');
     }
@@ -149,19 +151,16 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
 
       const newCustomerData = {
         ...customerData,
-        auth_user_id: userId,
+        id: userId, // Use auth user ID as primary key
         email: customerData.email,
-        profile_completion_percentage: calculateCompletionPercentage(customerData as Customer),
-        onboarding_completed: true, // Set to true when created through onboarding
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        profile_completion_percentage: calculateCompletionPercentage(customerData as Customer)
       };
 
       const { data, error: createError } = await supabase
-        .from('customers')
+        .from('customer')
         .insert([newCustomerData])
         .select()
-        .single();
+        .maybeSingle();
 
       if (createError) {
         throw createError;
@@ -199,11 +198,11 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
       updatedData.profile_completion_percentage = calculateCompletionPercentage(newCustomerData);
 
       const { data, error: updateError } = await supabase
-        .from('customers')
+        .from('customer')
         .update(updatedData)
         .eq('id', customer.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateError) {
         throw updateError;
@@ -231,7 +230,7 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
     if (customer?.id) {
       try {
         await supabase
-          .from('customers')
+          .from('customer')
           .update({ last_login_at: new Date().toISOString() })
           .eq('id', customer.id);
       } catch (err) {
@@ -266,8 +265,8 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
         { 
           event: '*', 
           schema: 'public', 
-          table: 'customers',
-          filter: `auth_user_id=eq.${user.id}`
+          table: 'customer',
+          filter: `id=eq.${user.id}`
         }, 
         (payload) => {
           console.log('Customer data changed:', payload);

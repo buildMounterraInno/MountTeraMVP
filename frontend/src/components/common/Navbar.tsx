@@ -20,10 +20,10 @@ const Navbar = () => {
 
   // Navigation data
   const allNavLinks = [
-    { path: '/', label: 'HOME' },
+    //{ path: '/', label: 'HOME' },
     { path: '/article', label: 'Article' },
     { path: '/about-us', label: 'About Us' },
-    { path: '/sherpa-ai', label: 'Sherpa AI' },
+   // { path: '/sherpa-ai', label: 'Sherpa AI' },
   ];
 
   // Filter navigation links based on current page
@@ -75,12 +75,12 @@ const Navbar = () => {
   return (
     <nav
       className={`font-nav fixed top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled ? 'md:py-2 md:px-4' : 'md:py-7 md:px-4'
+        isScrolled ? 'md:py-2 md:px-4' : 'md:py-4 md:px-4'
       }`}
     >
       {/* Desktop Header */}
       <div
-        className={`mx-auto max-w-7xl rounded-full px-6 py-4 ${glassClasses} shadow-[0_4px_25px_rgba(0,0,0,0.25)] hidden md:block`}
+        className={`mx-auto max-w-7xl rounded-full px-6 py-3 ${glassClasses} shadow-[0_4px_25px_rgba(0,0,0,0.25)] hidden md:block`}
       >
         <div className="flex items-center justify-between">
           {/* Left Section - Navigation Links */}
@@ -135,7 +135,7 @@ const Navbar = () => {
 
                 {/* Become a Vendor Button */}
                 <a 
-                  href="https://tpc-vendor-in-dev.vercel.app/" 
+                  href="https://vendor.trippechalo.in" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="font-button bg-[#1E63EF] hover:bg-[#1750CC] text-white font-medium px-4 py-1.5 text-sm rounded-full transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
@@ -149,7 +149,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Header */}
-      <div className={`${glassClasses} py-3 md:hidden w-full`}>
+      <div className={`${glassClasses} py-2 md:hidden w-full`}>
         <div className="flex items-center justify-between px-4">
           {/* Mobile Logo */}
           <Link to="/" className="flex items-center">
@@ -249,12 +249,11 @@ const Navbar = () => {
                   )}
                   <div>
                     <p className="font-ui text-white text-sm font-medium">
-                      {customer?.first_name && customer?.last_name 
+                      {customer?.first_name && customer?.last_name
                         ? `${customer.first_name} ${customer.last_name}`
                         : user.email?.split('@')[0]
                       }
                     </p>
-                    <p className="font-ui text-gray-300 text-xs font-light">{user.email}</p>
                   </div>
                 </div>
                 {customer && (

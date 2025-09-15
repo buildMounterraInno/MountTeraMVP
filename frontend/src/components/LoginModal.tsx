@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { signIn, signInWithGoogle, resetPassword } from '../lib/auth';
+import { signIn,  resetPassword } from '../lib/auth';
 import SignupForm from './SignupForm';
 
 interface LoginModalProps {
@@ -116,26 +116,26 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleGoogleSSO = async () => {
-    setLoading(true);
-    setErrors({});
+  // const handleGoogleSSO = async () => {
+  //   setLoading(true);
+  //   setErrors({});
 
-    try {
-      const { error } = await signInWithGoogle();
-      if (error) {
-        if (error.message.includes('different portal')) {
-          setErrors({ email: 'This Google account is registered for the vendor portal. Please use the vendor login page.' });
-        } else {
-          setErrors({ general: error.message });
-        }
-      }
-    } catch (error) {
-      setErrors({ general: 'Failed to sign in with Google. Please try again.' });
-      console.error('Google auth error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   try {
+  //     const { error } = await signInWithGoogle();
+  //     if (error) {
+  //       if (error.message.includes('different portal')) {
+  //         setErrors({ email: 'This Google account is registered for the vendor portal. Please use the vendor login page.' });
+  //       } else {
+  //         setErrors({ general: error.message });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     setErrors({ general: 'Failed to sign in with Google. Please try again.' });
+  //     console.error('Google auth error:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Handle escape key
   useEffect(() => {
@@ -315,7 +315,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Google SSO Button */}
-                <button
+                {/* <button
                   onClick={handleGoogleSSO}
                   disabled={loading}
                   className="w-full bg-white border border-gray-300 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
@@ -327,7 +327,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
                   Continue with Google
-                </button>
+                </button> */}
 
                 {/* Toggle Login/Signup - Hide for forgot password */}
                 <div className="text-center mt-6">

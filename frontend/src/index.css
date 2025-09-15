@@ -1,102 +1,5 @@
 @import 'tailwindcss';
 
-/* Global white color override */
-* {
-  --tw-bg-opacity: 1;
-}
-
-.bg-white {
-  background-color: #f5f5eb !important;
-}
-
-.text-white {
-  color: #f5f5eb !important;
-}
-
-.border-white {
-  border-color: #f5f5eb !important;
-}
-
-.ring-white {
-  --tw-ring-color: #f5f5eb !important;
-}
-
-.divide-white > :not([hidden]) ~ :not([hidden]) {
-  border-color: #f5f5eb !important;
-}
-
-/* Handle white with opacity variations */
-.bg-white\/90 {
-  background-color: rgba(245, 245, 235, 0.9) !important;
-}
-
-.bg-white\/80 {
-  background-color: rgba(245, 245, 235, 0.8) !important;
-}
-
-.bg-white\/70 {
-  background-color: rgba(245, 245, 235, 0.7) !important;
-}
-
-.bg-white\/60 {
-  background-color: rgba(245, 245, 235, 0.6) !important;
-}
-
-.bg-white\/50 {
-  background-color: rgba(245, 245, 235, 0.5) !important;
-}
-
-.bg-white\/40 {
-  background-color: rgba(245, 245, 235, 0.4) !important;
-}
-
-.bg-white\/30 {
-  background-color: rgba(245, 245, 235, 0.3) !important;
-}
-
-.bg-white\/20 {
-  background-color: rgba(245, 245, 235, 0.2) !important;
-}
-
-.bg-white\/10 {
-  background-color: rgba(245, 245, 235, 0.1) !important;
-}
-
-/* Text white with opacity */
-.text-white\/90 {
-  color: rgba(245, 245, 235, 0.9) !important;
-}
-
-.text-white\/80 {
-  color: rgba(245, 245, 235, 0.8) !important;
-}
-
-.text-white\/70 {
-  color: rgba(245, 245, 235, 0.7) !important;
-}
-
-/* Border white with opacity */
-.border-white\/60 {
-  border-color: rgba(245, 245, 235, 0.6) !important;
-}
-
-.border-white\/40 {
-  border-color: rgba(245, 245, 235, 0.4) !important;
-}
-
-.border-white\/30 {
-  border-color: rgba(245, 245, 235, 0.3) !important;
-}
-
-.border-white\/20 {
-  border-color: rgba(245, 245, 235, 0.2) !important;
-}
-
-/* Ring colors */
-.ring-white\/30 {
-  --tw-ring-color: rgba(245, 245, 235, 0.3) !important;
-}
-
 /* Beatrice Font Face Definitions */
 @font-face {
   font-family: 'Beatrice';
@@ -180,12 +83,6 @@
   /* Colors */
   --color-primary: oklch(0.55 0.2215 262.25);
   --color-luxury: oklch(0.1408 0.0044 285.82);
-  --color-white-custom: #f5f5eb;
-
-  /* Custom color overrides */
-  --color-white: #f5f5eb;
-  --color-gray-50: #fafaf8;
-  --color-gray-100: #f0f0e8;
 
   /* Fonts - Main Site Font (Now Using Beatrice) */
   --font-sans: 'Beatrice', ui-sans-serif, system-ui;
@@ -410,5 +307,3 @@
 .terminal-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(34, 197, 94, 0.7);
 }
-
-

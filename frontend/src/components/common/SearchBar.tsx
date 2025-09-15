@@ -140,7 +140,6 @@ const SearchBar = ({ onSearchTypeChange }: SearchBarProps = {}) => {
     setSearchData(prev => ({ ...prev, destination: suggestion.name }));
     setShowSuggestions(false);
     setActiveSection(null);
-    // Navigate to booking page for the selected item
     navigate(`/booking/${suggestion.type}/${suggestion.id}`);
   };
 

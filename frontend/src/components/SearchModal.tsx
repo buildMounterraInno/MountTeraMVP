@@ -25,7 +25,7 @@ interface SearchResult {
 // };
 
 const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
-  const [selectedType, setSelectedType] = useState<SearchType>('adventures');
+  const [selectedType, setSelectedType] = useState<SearchType>('events');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -193,7 +193,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
             {/* Mobile: Stacked Layout */}
             <div className="flex flex-col space-y-2 md:hidden">
               {[
-                { id: 'adventures' as SearchType, label: 'Adventures' },
+                // { id: 'adventures' as SearchType, label: 'Adventures' }, // Commented out for now
                 { id: 'events' as SearchType, label: 'Events & Experiences' }
               ].map((tab) => (
                 <button
@@ -214,7 +214,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
             <div className="hidden md:flex justify-center">
               <div className="flex bg-white/5 rounded-xl p-1">
                 {[
-                  { id: 'adventures' as SearchType, label: 'Adventures' },
+                  // { id: 'adventures' as SearchType, label: 'Adventures' }, // Commented out for now
                   { id: 'events' as SearchType, label: 'Events & Experiences' }
                 ].map((tab) => (
                   <button

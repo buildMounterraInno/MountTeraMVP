@@ -142,14 +142,14 @@ const ArticlePage = () => {
       <section className="py-16 bg-[#f5f5eb]">
         <div className="max-w-4xl mx-auto px-8">
           <div 
-            className="font-body text-gray-800 leading-relaxed max-w-none"
+            className="font-body text-gray-800 leading-relaxed max-w-none article-content-wrapper"
             style={{
               fontSize: '18px',
               lineHeight: '1.8'
             }}
           >
             <div 
-              className="article-content"
+              className="article-content prose prose-lg prose-gray max-w-none"
               dangerouslySetInnerHTML={{ 
                 __html: article.content.replace(/\n/g, '<br />') 
               }}
@@ -157,52 +157,58 @@ const ArticlePage = () => {
           </div>
         </div>
         
-        <style jsx>{`
-          .article-content {
-            /* Remove default underlines from all text */
+        <style>{`
+          .article-content-wrapper .article-content {
             text-decoration: none;
           }
           
-          .article-content * {
-            /* Remove underlines from all child elements */
+          .article-content-wrapper .article-content * {
             text-decoration: none !important;
           }
           
-          .article-content a {
-            /* Only links should have underlines, and only on hover */
+          .article-content-wrapper .article-content a {
             text-decoration: none !important;
             color: #2563eb;
             font-weight: 500;
           }
           
-          .article-content a:hover {
+          .article-content-wrapper .article-content a:hover {
             text-decoration: underline !important;
           }
           
-          .article-content p {
+          .article-content-wrapper .article-content p {
             margin-bottom: 1.5rem;
           }
           
-          .article-content h1,
-          .article-content h2,
-          .article-content h3,
-          .article-content h4,
-          .article-content h5,
-          .article-content h6 {
+          .article-content-wrapper .article-content h1,
+          .article-content-wrapper .article-content h2,
+          .article-content-wrapper .article-content h3,
+          .article-content-wrapper .article-content h4,
+          .article-content-wrapper .article-content h5,
+          .article-content-wrapper .article-content h6 {
             font-weight: 600;
             margin-top: 2rem;
             margin-bottom: 1rem;
             text-decoration: none !important;
           }
           
-          .article-content ul,
-          .article-content ol {
+          .article-content-wrapper .article-content ul,
+          .article-content-wrapper .article-content ol {
             margin-bottom: 1.5rem;
             padding-left: 1.5rem;
           }
           
-          .article-content li {
+          .article-content-wrapper .article-content li {
             margin-bottom: 0.5rem;
+          }
+
+          /* Override prose styles that might add underlines */
+          .article-content-wrapper .prose a {
+            text-decoration: none !important;
+          }
+          
+          .article-content-wrapper .prose a:hover {
+            text-decoration: underline !important;
           }
         `}</style>
       </section>

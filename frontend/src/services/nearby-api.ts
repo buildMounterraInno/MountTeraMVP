@@ -82,8 +82,8 @@ interface ErrorResponse {
   message: string;
 }
 
-const API_BASE_URL = 'https://primary-production-b3fe0.up.railway.app';
-const VASTUSETU_API_BASE_URL = 'https://www.vastusetu.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://primary-production-b3fe0.up.railway.app';
+const VASTUSETU_API_BASE_URL = import.meta.env.VITE_VASTUSETU_API_BASE_URL || 'https://www.vastusetu.com';
 
 export class NearbyApiService {
   private static baseUrl = API_BASE_URL;
@@ -225,7 +225,32 @@ export class NearbyApiService {
    */
   static async getEventDetails(eventId: string): Promise<DetailedEvent> {
     try {
-      const response = await fetch(`${this.vastusetuBaseUrl}/api/events/getevent/${eventId}`, {
+      const apiUrl = `${this.vastusetuBaseUrl}/api/events/getevent/${eventId}`;
+
+      const debugInfo = {
+        eventId,
+        apiUrl,
+        vastusetuBaseUrl: this.vastusetuBaseUrl,
+        env: {
+          VITE_VASTUSETU_API_BASE_URL: import.meta.env.VITE_VASTUSETU_API_BASE_URL,
+          NODE_ENV: import.meta.env.NODE_ENV,
+          MODE: import.meta.env.MODE
+        }
+      };
+
+      console.log('🎯 Fetching event details:', debugInfo);
+
+      // Store debug info globally for inspection
+      (window as any).lastEventApiCall = debugInfo;
+
+      // Removed aggressive alert debugging
+
+      // Alert for immediate visibility (remove after debugging)
+      if (import.meta.env.MODE === 'production') {
+        console.warn('PRODUCTION DEBUG - Event API Call:', JSON.stringify(debugInfo, null, 2));
+      }
+
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -234,9 +259,42 @@ export class NearbyApiService {
 
       const data = await response.json();
 
+      const responseInfo = {
+        eventId,
+        status: response.status,
+        ok: response.ok,
+        url: apiUrl,
+        data: response.ok ? data : 'Error response'
+      };
+
+      console.log('📊 Event details API response:', responseInfo);
+
+      // Store response info globally
+      (window as any).lastEventApiResponse = responseInfo;
+
       if (!response.ok) {
         const errorData = data as ErrorResponse;
-        throw new Error(errorData.message || errorData.error || 'Failed to fetch event details');
+        const errorInfo = {
+          eventId,
+          status: response.status,
+          error: errorData.error,
+          message: errorData.message,
+          fullResponse: data
+        };
+
+        console.error('❌ Event details API failed:', errorInfo);
+
+        // Store error info globally
+        (window as any).lastEventApiError = errorInfo;
+
+        // Removed aggressive alert debugging
+
+        // Production debugging - show error info
+        if (import.meta.env.MODE === 'production') {
+          console.warn('PRODUCTION DEBUG - Event API Error:', JSON.stringify(errorInfo, null, 2));
+        }
+
+        throw new Error(errorData.message || errorData.error || `Failed to fetch event details (${response.status})`);
       }
 
       // Handle wrapped response format
@@ -257,7 +315,15 @@ export class NearbyApiService {
    */
   static async getExperienceDetails(experienceId: string): Promise<DetailedExperience> {
     try {
-      const response = await fetch(`${this.vastusetuBaseUrl}/api/recurringevents/getrecurringevent/${experienceId}`, {
+      const apiUrl = `${this.vastusetuBaseUrl}/api/recurringevents/getrecurringevent/${experienceId}`;
+
+      console.log('🎯 Fetching experience details:', {
+        experienceId,
+        apiUrl,
+        vastusetuBaseUrl: this.vastusetuBaseUrl
+      });
+
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -266,9 +332,24 @@ export class NearbyApiService {
 
       const data = await response.json();
 
+      console.log('📊 Experience details API response:', {
+        experienceId,
+        status: response.status,
+        ok: response.ok,
+        url: apiUrl,
+        data: response.ok ? data : 'Error response'
+      });
+
       if (!response.ok) {
         const errorData = data as ErrorResponse;
-        throw new Error(errorData.message || errorData.error || 'Failed to fetch experience details');
+        console.error('❌ Experience details API failed:', {
+          experienceId,
+          status: response.status,
+          error: errorData.error,
+          message: errorData.message,
+          fullResponse: data
+        });
+        throw new Error(errorData.message || errorData.error || `Failed to fetch experience details (${response.status})`);
       }
 
       // Handle wrapped response format

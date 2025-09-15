@@ -1,13 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { 
-  User, 
-  Camera, 
-  Edit2, 
-  Save, 
-  X, 
-  Shield
+import React, { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import {
+  User,
+  Camera,
+  Edit2,
+  Save,
+  X,
+  Shield,
+  Heart
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import WishlistTab from './WishlistTab';
 
 interface Customer {
   id?: string;
@@ -27,12 +30,13 @@ interface ProfileSectionProps {
   isLoading?: boolean;
 }
 
-const ProfileSection: React.FC<ProfileSectionProps> = ({ 
-  customer, 
-  onUpdateCustomer, 
-  isLoading = false 
+const ProfileSection: React.FC<ProfileSectionProps> = ({
+  customer,
+  onUpdateCustomer,
+  isLoading = false
 }) => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('personal');
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<Partial<Customer>>({});
@@ -41,8 +45,17 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User },
+    { id: 'wishlist', label: 'Wishlist', icon: Heart },
     { id: 'security', label: 'Security', icon: Shield }
   ];
+
+  // Set active tab based on URL params
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabs.some(tab => tab.id === tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   const handleEdit = () => {
     setEditedData(customer || {});
@@ -328,6 +341,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         {/* Tab Content */}
         <div className="p-8">
           {activeTab === 'personal' && renderPersonalTab()}
+          {activeTab === 'wishlist' && <WishlistTab />}
           {/* Security tab would be implemented here */}
         </div>
       </div>

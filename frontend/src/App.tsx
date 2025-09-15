@@ -15,7 +15,9 @@ import AboutUs from './pages/AboutUs';
 import TestPage from './pages/TestPage';
 import SimpleTest from './pages/SimpleTest';
 import ProfilePage from './pages/ProfilePage';
+import MyBookingsPage from './pages/MyBookingsPage';
 import BookingPage from './pages/BookingPage';
+import EmailTestPage from './pages/EmailTestPage';
 import AuthCallback from './components/AuthCallback';
 import ScrollToTop from './components/common/ScrollToTop';
 
@@ -37,9 +39,11 @@ function App() {
           <Route path="/article/:slug" element={<ArticlePage />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
           <Route path="/booking/:type/:id" element={<BookingPage />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/simple-test" element={<SimpleTest />} />
+          <Route path="/email-test" element={<EmailTestPage />} />
           <Route path="/sherpa-ai" element={<SherpaAI />} />
           <Route path="/pages/HamptaPassTrek" element={<HamptaPassTrek />} />
           <Route path="/pages/KedarkanthaTrek" element={<KedarkanthaTrek />} />

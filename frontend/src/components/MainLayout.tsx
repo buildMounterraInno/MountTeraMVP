@@ -4,6 +4,7 @@ import Navbar from './common/Navbar';
 import Footer from './common/Footer';
 import { CustomerProvider, useCustomer } from '../contexts/CustomerContext';
 import { useAuth } from '../contexts/AuthContext';
+import { WishlistProvider } from '../contexts/WishlistContext';
 import ProfileSetupModal from './ProfileSetupModal';
 
 // Inner component that has access to CustomerContext
@@ -47,7 +48,9 @@ const MainLayoutContent: React.FC = () => {
 function MainLayout() {
   return (
     <CustomerProvider>
-      <MainLayoutContent />
+      <WishlistProvider>
+        <MainLayoutContent />
+      </WishlistProvider>
     </CustomerProvider>
   );
 }

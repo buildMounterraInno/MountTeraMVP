@@ -20,7 +20,7 @@ interface ErrorResponse {
   message: string;
 }
 
-const SHERPA_API_BASE_URL = 'http://localhost:5000';
+const SHERPA_API_BASE_URL = 'https://www.vastusetu.com';
 
 export class SherpaApiService {
   private static baseUrl = SHERPA_API_BASE_URL;

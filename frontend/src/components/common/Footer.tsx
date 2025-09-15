@@ -20,8 +20,8 @@ const Footer = () => {
   };
 
   const phoneContact = {
-    number: '+91 96856 09494',
-    link: 'tel:+919685609494',
+    number: '+91 9685609494 / +91 9669614697',
+    link: 'tel:+919669614697',
   };
 
   const footerSections = [

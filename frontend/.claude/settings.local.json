@@ -9,7 +9,8 @@
       "Bash(grep:*)",
       "Read(C:\\Users\\ASUS\\Desktop\\Codes/**)",
       "WebFetch(domain:www.travelperk.com)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm run server:*)"
     ],
     "deny": [],
     "additionalDirectories": [

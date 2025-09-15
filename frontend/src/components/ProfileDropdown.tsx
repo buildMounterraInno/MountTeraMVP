@@ -109,7 +109,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ customer }) => {
     {
       icon: Heart,
       label: 'Wishlist',
-      path: '/wishlist',
+      path: '/profile?tab=wishlist',
       description: 'Your saved treks and experiences'
     },
     {
@@ -136,7 +136,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ customer }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-200 group"
+        className="flex items-center gap-3 hover:opacity-80 transition-all duration-200 group"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
@@ -167,9 +167,6 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ customer }) => {
         <div className="hidden lg:block text-left">
           <p className="text-white text-sm font-medium leading-tight">
             {getDisplayName()}
-          </p>
-          <p className="text-white/70 text-xs leading-tight">
-            {user?.email}
           </p>
         </div>
 
@@ -207,9 +204,6 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ customer }) => {
                 <h3 className="text-gray-900 font-semibold text-base truncate">
                   {getDisplayName()}
                 </h3>
-                <p className="text-gray-600 text-sm truncate">
-                  {user?.email}
-                </p>
                 {!customer?.onboarding_completed && (
                   <div className="flex items-center gap-1 mt-1">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>

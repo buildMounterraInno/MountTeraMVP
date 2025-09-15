@@ -150,10 +150,99 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
         console.error('Auth signup error:', error);
         
         // Handle different types of auth errors
-        if (error.message.toLowerCase().includes('already registered') || 
+        if (error.message.toLowerCase().includes('already registered') ||
             error.message.toLowerCase().includes('user already registered') ||
             error.message.toLowerCase().includes('email already registered')) {
-          setErrors({ email: 'This email is already registered. Please try logging in instead.' });
+
+          // Check if this is an orphaned auth user (auth exists but no customer profile)
+          try {
+            const { data: existingSession, error: signInError } = await supabase.auth.signInWithPassword({
+              email: formData.email,
+              password: formData.password
+            });
+
+
+            if (signInError) {
+              // Fall back to standard error message
+              setErrors({ email: 'This email is already registered. Please try logging in instead.' });
+              setTimeout(() => {
+                const switchToLogin = confirm('This email is already registered. Would you like to switch to the login form?');
+                if (switchToLogin) {
+                  onSwitchToLogin();
+                }
+              }, 1500);
+              return;
+            }
+
+            if (existingSession.user) {
+
+              // Try to fetch customer profile
+              const { data: customerData, error: customerError } = await supabase
+                .from('customer')
+                .select('id')
+                .eq('id', existingSession.user.id)
+                .maybeSingle(); // Use maybeSingle() instead of single() to handle no results gracefully
+
+              if (customerError) {
+                console.error('Error checking customer profile:', customerError);
+                // Fall back to standard error handling
+                await supabase.auth.signOut();
+                setErrors({ email: 'This email is already registered. Please try logging in instead.' });
+                return;
+              }
+
+              if (!customerData) {
+                // No customer profile exists - this is an orphaned auth user
+
+                try {
+                  await createCustomer({
+                    email: formData.email,
+                    first_name: formData.first_name,
+                    last_name: formData.last_name,
+                    phone_number: formData.phone_number || undefined,
+                    gender: formData.gender,
+                    date_of_birth: formData.date_of_birth,
+                    profile_completion_percentage: 100
+                  }, existingSession.user.id); // Pass the user ID directly
+
+                  onSuccess(); // Profile creation successful, proceed with login
+                  return;
+                } catch (customerCreateError) {
+                  console.error('Failed to create customer profile for orphaned user:', customerCreateError);
+                  await supabase.auth.signOut(); // Sign out the user
+                  setErrors({
+                    general: 'Account setup incomplete. Please try signing up again or contact support.'
+                  });
+                  return;
+                }
+              } else {
+                // Customer profile exists - this is a duplicate signup
+                await supabase.auth.signOut(); // Sign out to prevent session issues
+                setErrors({ email: 'This email is already registered. Please try logging in instead.' });
+
+                // Show a helpful prompt to switch to login
+                setTimeout(() => {
+                  const switchToLogin = confirm('This email is already registered. Would you like to switch to the login form?');
+                  if (switchToLogin) {
+                    onSwitchToLogin();
+                  }
+                }, 1500);
+                return;
+              }
+            }
+          } catch (loginCheckError) {
+            // Fall back to standard error message
+            setErrors({ email: 'This email is already registered. Please try logging in instead.' });
+
+            // Show a helpful prompt to switch to login
+            setTimeout(() => {
+              const switchToLogin = confirm('This email is already registered. Would you like to switch to the login form?');
+              if (switchToLogin) {
+                onSwitchToLogin();
+              }
+            }, 1500);
+            return;
+          }
         } else if (error.message.toLowerCase().includes('email not confirmed') || 
                    error.message.toLowerCase().includes('email not verified')) {
           setErrors({ email: 'Please check your email and click the confirmation link to verify your account.' });
@@ -181,7 +270,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
             gender: formData.gender,
             date_of_birth: formData.date_of_birth,
             profile_completion_percentage: 100
-          });
+          }, data.user.id); // Pass the user ID directly
 
           console.log('Customer profile created successfully');
           onSuccess();
@@ -211,7 +300,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) =
           });
         }
       } else {
-        console.log('User created, waiting for email confirmation');
         setErrors({ 
           general: 'Account created successfully! Please check your email to verify your account before signing in.' 
         });
