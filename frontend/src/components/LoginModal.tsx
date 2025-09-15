@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { signIn,  resetPassword } from '../lib/auth';
 import SignupForm from './SignupForm';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     general?: string;
   }>({});
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -274,7 +276,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 <div className="text-right">
                   <button
                     type="button"
-                    onClick={() => setShowForgotPassword(true)}
+                    onClick={() => setShowForgotPasswordModal(true)}
                     className="text-sm text-[#1E63EF] hover:text-[#E31E56] font-medium transition-colors duration-200"
                   >
                     Forgot Password?
@@ -349,6 +351,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
+      />
     </>
   );
 };
