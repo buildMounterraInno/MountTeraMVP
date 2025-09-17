@@ -53,7 +53,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -297,6 +296,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </div>
               )}
 
+
               {/* Submit Button */}
               <button
                 type="submit"
@@ -306,6 +306,24 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 {loading ? 'Loading...' : showForgotPassword ? 'Send Reset Email' : 'Login'}
               </button>
             </form>
+
+            {/* Terms Disclaimer - Hide for forgot password */}
+            {!showForgotPassword && (
+              <div className="text-center mt-4 mb-4">
+                <p className="text-xs text-gray-500">
+                  By logging in, you agree to our{' '}
+                  <a
+                    href="/terms-and-conditions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#1E63EF] hover:text-[#E31E56] font-medium transition-colors duration-200"
+                  >
+                    Terms & Conditions
+                  </a>
+                  .
+                </p>
+              </div>
+            )}
 
             {/* Divider - Hide for forgot password */}
             {!showForgotPassword && (
