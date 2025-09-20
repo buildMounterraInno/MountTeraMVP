@@ -225,6 +225,34 @@ export const updatePassword = async (newPassword: string): Promise<{ error: Auth
   }
 };
 
+// Check if email exists in the system
+export const checkEmailExists = async (email: string): Promise<{ exists: boolean; error: AuthError | null }> => {
+  try {
+    // Use Supabase's resetPasswordForEmail with a dummy redirect to check if email exists
+    // This is a safe way to check email existence without exposing user data
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/dummy-check`
+    });
+
+    if (error) {
+      // If the error indicates user not found, email doesn't exist
+      if (error.message.toLowerCase().includes('user not found') ||
+          error.message.toLowerCase().includes('email not found') ||
+          error.message.toLowerCase().includes('invalid email')) {
+        return { exists: false, error: null };
+      }
+      // Other errors (like rate limiting) should be treated as system errors
+      return { exists: false, error };
+    }
+
+    // If no error, email exists
+    return { exists: true, error: null };
+  } catch (error) {
+    console.error('Check email exists exception:', error);
+    return { exists: false, error: error as AuthError };
+  }
+};
+
 // Helper function to validate portal access
 export const validatePortalAccess = (user: any): boolean => {
   const portalType = user?.user_metadata?.portal_type;
