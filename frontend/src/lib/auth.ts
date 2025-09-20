@@ -226,7 +226,7 @@ export const updatePassword = async (newPassword: string): Promise<{ error: Auth
 };
 
 // Check if email exists in the system
-export const checkEmailExists = async (email: string): Promise<{ exists: boolean; error: AuthError | null }> => {
+export const checkEmailExists = async (_email: string): Promise<{ exists: boolean; error: AuthError | null }> => {
   try {
     // Supabase doesn't provide a direct way to check email existence for security reasons
     // Both non-existent emails and wrong passwords return "Invalid login credentials"

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { signIn, resetPassword, checkEmailExists } from '../lib/auth';
+import { signIn, resetPassword } from '../lib/auth';
 import SignupForm from './SignupForm';
 import ForgotPasswordModal from './ForgotPasswordModal';
 
