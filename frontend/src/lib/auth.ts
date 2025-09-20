@@ -228,28 +228,13 @@ export const updatePassword = async (newPassword: string): Promise<{ error: Auth
 // Check if email exists in the system
 export const checkEmailExists = async (email: string): Promise<{ exists: boolean; error: AuthError | null }> => {
   try {
-    // Use Supabase's resetPasswordForEmail with a dummy redirect to check if email exists
-    // This is a safe way to check email existence without exposing user data
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/dummy-check`
-    });
-
-    if (error) {
-      // If the error indicates user not found, email doesn't exist
-      if (error.message.toLowerCase().includes('user not found') ||
-          error.message.toLowerCase().includes('email not found') ||
-          error.message.toLowerCase().includes('invalid email')) {
-        return { exists: false, error: null };
-      }
-      // Other errors (like rate limiting) should be treated as system errors
-      return { exists: false, error };
-    }
-
-    // If no error, email exists
-    return { exists: true, error: null };
+    // Supabase doesn't provide a direct way to check email existence for security reasons
+    // Both non-existent emails and wrong passwords return "Invalid login credentials"
+    // So we'll disable this check and handle it in the login flow instead
+    return { exists: true, error: null }; // Always assume email exists to avoid false negatives
   } catch (error) {
     console.error('Check email exists exception:', error);
-    return { exists: false, error: error as AuthError };
+    return { exists: true, error: null }; // Default to assuming email exists
   }
 };
 

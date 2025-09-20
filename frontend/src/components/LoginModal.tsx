@@ -82,22 +82,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           setShowForgotPassword(false);
         }
       } else {
-        // First check if email exists
-        const { exists, error: emailCheckError } = await checkEmailExists(email);
-
-        if (emailCheckError) {
-          // If there's an error checking email (rate limiting, network issues), proceed with normal sign-in
-          console.warn('Could not check email existence, proceeding with sign-in:', emailCheckError);
-        } else if (!exists) {
-          // Email doesn't exist in the system
-          setErrors({
-            email: 'Please check the email address spelling or create a new account as this email does not exist.'
-          });
-          setLoading(false);
-          return;
-        }
-
-        // Email exists (or we couldn't check), proceed with sign-in
+        // Proceed with sign-in directly
         const { user, error } = await signIn(email, password);
         if (error) {
           if (error.message.includes('different portal')) {
@@ -106,14 +91,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                      error.message.toLowerCase().includes('invalid email or password') ||
                      error.message.toLowerCase().includes('incorrect password') ||
                      error.message.toLowerCase().includes('wrong password')) {
-            // Since we already confirmed email exists, this must be a password issue
-            setErrors({ password: 'Password is wrong. Please check your password or reset it.' });
+            // For security reasons, Supabase returns the same error for non-existent emails and wrong passwords
+            setErrors({ general: 'Invalid email or password. Please check your credentials or create a new account if you don\'t have one.' });
           } else if (error.message.toLowerCase().includes('email not confirmed') ||
                      error.message.toLowerCase().includes('email not verified')) {
             setErrors({ email: 'Please check your email and click the confirmation link before logging in.' });
           } else if (error.message.toLowerCase().includes('user not found') ||
                      error.message.toLowerCase().includes('email not found')) {
-            setErrors({ email: 'Please check the email address spelling or create a new account as this email does not exist.' });
+            setErrors({ general: 'Invalid email or password. Please check your credentials or create a new account if you don\'t have one.' });
           } else if (error.message.toLowerCase().includes('email')) {
             setErrors({ email: error.message });
           } else if (error.message.toLowerCase().includes('password')) {
