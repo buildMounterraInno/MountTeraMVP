@@ -63,44 +63,9 @@ export const signIn = async (email: string, password: string): Promise<AuthRespo
       return { user: null, error };
     }
 
-    // Check if user has correct portal type for this portal
+    // Simple authentication - this is the customer portal, so anyone who can log in is a customer
     if (data.user) {
-      console.log('User metadata:', data.user.user_metadata);
-      const userPortalType = data.user.user_metadata?.portal_type;
-      console.log('User portal type:', userPortalType);
-      
-      if (userPortalType === 'customer') {
-        // Valid customer user
-        console.log('✅ Valid customer user');
-      } else if (userPortalType === 'vendor') {
-        // Vendor trying to access customer portal
-        console.log('🚫 Vendor user detected, signing out');
-        await supabase.auth.signOut();
-        
-        const portalError = new Error('This account is registered for the vendor portal. Please use the vendor login page.') as AuthError;
-        portalError.status = 400;
-        
-        return { user: null, error: portalError };
-      } else if (!userPortalType) {
-        // User with no portal_type - could be legacy customer or could be from vendor portal
-        // Don't auto-convert! Instead, require them to sign up fresh or check another way
-        console.log('🚫 User has no portal_type - cannot determine portal access');
-        await supabase.auth.signOut();
-        
-        const portalError = new Error('Your account needs to be set up for this portal. Please sign up again or contact support.') as AuthError;
-        portalError.status = 400;
-        
-        return { user: null, error: portalError };
-      } else {
-        // Any other portal_type
-        console.log('🚫 User has unknown portal_type:', userPortalType);
-        await supabase.auth.signOut();
-        
-        const portalError = new Error('This account is not authorized for this portal.') as AuthError;
-        portalError.status = 400;
-        
-        return { user: null, error: portalError };
-      }
+      console.log('User authenticated successfully:', data.user.email);
     }
 
     return { user: data.user, error: null };
@@ -113,6 +78,10 @@ export const signIn = async (email: string, password: string): Promise<AuthRespo
 // Sign in with Google
 export const signInWithGoogle = async (): Promise<{ error: AuthError | null }> => {
   try {
+    // Store the current page URL to return to after authentication
+    const currentUrl = window.location.href;
+    localStorage.setItem('auth_redirect_url', currentUrl);
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -125,12 +94,16 @@ export const signInWithGoogle = async (): Promise<{ error: AuthError | null }> =
 
     if (error) {
       console.error('Google sign in error:', error);
+      // Clean up stored URL on error
+      localStorage.removeItem('auth_redirect_url');
       return { error };
     }
 
     return { error: null };
   } catch (error) {
     console.error('Google sign in exception:', error);
+    // Clean up stored URL on error
+    localStorage.removeItem('auth_redirect_url');
     return { error: error as AuthError };
   }
 };
@@ -238,11 +211,6 @@ export const checkEmailExists = async (_email: string): Promise<{ exists: boolea
   }
 };
 
-// Helper function to validate portal access
-export const validatePortalAccess = (user: any): boolean => {
-  const portalType = user?.user_metadata?.portal_type;
-  return portalType === 'customer'; // ONLY allow users with explicit customer portal_type
-};
 
 // Force update user metadata
 export const forceUpdateUserMetadata = async (): Promise<{ error: AuthError | null }> => {

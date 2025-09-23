@@ -11,6 +11,7 @@ import {
   Check,
 } from 'lucide-react';
 import { useCustomer } from '../contexts/CustomerContext';
+import GoogleSSOButton from './GoogleSSOButton';
 
 interface SignupFormData {
   email: string;
@@ -245,7 +246,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
                 return;
               }
             }
-          } catch (loginCheckError) {
+          } catch {
             // Fall back to standard error message
             setErrors({
               email:
@@ -355,6 +356,10 @@ const SignupForm: React.FC<SignupFormProps> = ({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleError = (error: string) => {
+    setErrors({ general: error });
   };
 
   return (
@@ -655,6 +660,20 @@ const SignupForm: React.FC<SignupFormProps> = ({
             'Create Account'
           )}
         </button>
+
+        {/* Divider */}
+        <div className="flex items-center my-4">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className="px-4 text-xs text-gray-500 sm:text-sm">or</span>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+
+        {/* Google SSO Button */}
+        <GoogleSSOButton
+          onError={handleGoogleError}
+          loading={isLoading}
+          setLoading={setIsLoading}
+        />
 
         {/* Switch to Login */}
         <div className="pt-2 text-center sm:pt-3">

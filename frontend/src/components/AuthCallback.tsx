@@ -17,48 +17,134 @@ const AuthCallback: React.FC = () => {
         }
 
         if (data.session) {
-          // Check portal type for OAuth users
+          // For new Google OAuth users, set portal_type to customer and create profile
           const userPortalType = data.session.user.user_metadata?.portal_type;
-          
-          // If user doesn't have portal_type (new Google OAuth user), set it to customer
+
           if (!userPortalType) {
             console.log('New Google OAuth user, setting portal_type to customer');
+
+            // Check if a customer profile already exists with this email
+            const userEmail = data.session.user.email;
+            let existingCustomer = null;
+
+            if (userEmail) {
+              try {
+                const { data: customerData, error: customerCheckError } = await supabase
+                  .from('customer')
+                  .select('id, auth_user_id')
+                  .eq('email', userEmail)
+                  .maybeSingle();
+
+                if (!customerCheckError && customerData) {
+                  existingCustomer = customerData;
+                  console.log('Found existing customer profile with same email:', customerData);
+                }
+              } catch (error) {
+                console.log('Error checking for existing customer:', error);
+              }
+            }
+
             const { error: updateError } = await supabase.auth.updateUser({
-              data: { 
+              data: {
                 portal_type: 'customer',
                 updated_at: new Date().toISOString()
               }
             });
-            
+
             if (updateError) {
               console.error('Failed to set portal_type for OAuth user:', updateError);
               await supabase.auth.signOut();
               navigate('/?error=metadata_update_failed');
               return;
             }
-            
+
+            // Handle customer profile creation or linking
+            try {
+              if (existingCustomer && existingCustomer.auth_user_id !== data.session.user.id) {
+                // Link the existing customer profile to the new Google auth user
+                console.log('Linking existing customer profile to Google OAuth user');
+
+                const { error: linkError } = await supabase
+                  .from('customer')
+                  .update({
+                    auth_user_id: data.session.user.id,
+                    updated_at: new Date().toISOString(),
+                    last_login_at: new Date().toISOString()
+                  })
+                  .eq('id', existingCustomer.id);
+
+                if (linkError) {
+                  console.error('Failed to link existing customer profile:', linkError);
+                  // Continue anyway - don't fail the auth process
+                } else {
+                  console.log('✅ Successfully linked existing customer profile to Google OAuth user');
+                }
+              } else if (!existingCustomer) {
+                // Create new customer profile for new Google OAuth user
+                const userMetadata = data.session.user.user_metadata;
+                const fullName = userMetadata?.full_name || userMetadata?.name || '';
+                const firstName = userMetadata?.given_name || fullName.split(' ')[0] || 'User';
+                const lastName = userMetadata?.family_name || fullName.split(' ').slice(1).join(' ') || '';
+
+                const { error: customerError } = await supabase
+                  .from('customer')
+                  .insert([{
+                    id: data.session.user.id,
+                    auth_user_id: data.session.user.id,
+                    email: userEmail || '',
+                    first_name: firstName,
+                    last_name: lastName,
+                    phone_number: null,
+                    gender: 'prefer_not_to_say',
+                    profile_completion_percentage: 80,
+                    account_status: 'active',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    last_login_at: new Date().toISOString()
+                  }])
+                  .select()
+                  .single();
+
+                if (customerError) {
+                  console.log('Customer profile creation failed:', customerError);
+                  // Don't fail the auth process if profile creation fails
+                } else {
+                  console.log('✅ Customer profile created for Google OAuth user');
+                }
+              } else {
+                console.log('✅ Customer profile already exists and linked correctly');
+              }
+            } catch (customerError) {
+              console.log('Customer profile handling failed:', customerError);
+              // Don't fail the auth process
+            }
+
             console.log('✅ Portal type set to customer for Google OAuth user');
-            navigate('/');
+
+            // Redirect back to the original page
+            const redirectUrl = localStorage.getItem('auth_redirect_url');
+            localStorage.removeItem('auth_redirect_url');
+
+            if (redirectUrl && redirectUrl !== window.location.origin + '/auth/callback') {
+              window.location.href = redirectUrl;
+            } else {
+              navigate('/');
+            }
             return;
           }
-          
-          // Block vendor users from customer portal (same as email auth)
-          if (userPortalType === 'vendor') {
-            console.log('🚫 Vendor user detected via Google OAuth, signing out');
-            await supabase.auth.signOut();
-            navigate('/?error=vendor_portal_required');
-            return;
-          }
-          
-          if (userPortalType !== 'customer') {
-            console.log('OAuth user has unknown portal type, signing out');
-            await supabase.auth.signOut();
-            navigate('/?error=unauthorized_portal');
-            return;
-          }
-          
+
+          // For existing users, just continue with login
           console.log('User authenticated:', data.session.user);
-          navigate('/');
+
+          // Redirect back to the original page
+          const redirectUrl = localStorage.getItem('auth_redirect_url');
+          localStorage.removeItem('auth_redirect_url');
+
+          if (redirectUrl && redirectUrl !== window.location.origin + '/auth/callback') {
+            window.location.href = redirectUrl;
+          } else {
+            navigate('/');
+          }
         } else {
           navigate('/?error=no_session');
         }
