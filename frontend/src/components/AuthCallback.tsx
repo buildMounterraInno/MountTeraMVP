@@ -8,23 +8,49 @@ const AuthCallback: React.FC = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Auth callback error:', error);
+        // First, try to get the session from the URL hash (OAuth callback)
+        const { data: authData, error: authError } = await supabase.auth.getSession();
+
+        if (authError) {
+          console.error('Auth callback error:', authError);
           navigate('/?error=auth_failed');
           return;
         }
 
-        if (data.session) {
+        // If no session, try to get user directly (might be OAuth flow)
+        if (!authData.session) {
+          const { data: userData, error: userError } = await supabase.auth.getUser();
+
+          if (userError || !userData.user) {
+            console.error('No session or user found:', userError);
+            navigate('/?error=no_session');
+            return;
+          }
+
+          // User exists but no session - this is normal for OAuth
+          console.log('OAuth user authenticated:', userData.user.email);
+
+          // Redirect back to the original page
+          const redirectUrl = localStorage.getItem('auth_redirect_url');
+          localStorage.removeItem('auth_redirect_url');
+
+          if (redirectUrl && redirectUrl !== window.location.origin + '/auth/callback') {
+            window.location.href = redirectUrl;
+          } else {
+            navigate('/');
+          }
+          return;
+        }
+
+        if (authData.session) {
           // For new Google OAuth users, set portal_type to customer and create profile
-          const userPortalType = data.session.user.user_metadata?.portal_type;
+          const userPortalType = authData.session.user.user_metadata?.portal_type;
 
           if (!userPortalType) {
             console.log('New Google OAuth user, setting portal_type to customer');
 
             // Check if a customer profile already exists with this email
-            const userEmail = data.session.user.email;
+            const userEmail = authData.session.user.email;
             let existingCustomer = null;
 
             if (userEmail) {
@@ -60,14 +86,14 @@ const AuthCallback: React.FC = () => {
 
             // Handle customer profile creation or linking
             try {
-              if (existingCustomer && existingCustomer.auth_user_id !== data.session.user.id) {
+              if (existingCustomer && existingCustomer.auth_user_id !== authData.session.user.id) {
                 // Link the existing customer profile to the new Google auth user
                 console.log('Linking existing customer profile to Google OAuth user');
 
                 const { error: linkError } = await supabase
                   .from('customer')
                   .update({
-                    auth_user_id: data.session.user.id,
+                    auth_user_id: authData.session.user.id,
                     updated_at: new Date().toISOString(),
                     last_login_at: new Date().toISOString()
                   })
@@ -81,7 +107,7 @@ const AuthCallback: React.FC = () => {
                 }
               } else if (!existingCustomer) {
                 // Create new customer profile for new Google OAuth user
-                const userMetadata = data.session.user.user_metadata;
+                const userMetadata = authData.session.user.user_metadata;
                 const fullName = userMetadata?.full_name || userMetadata?.name || '';
                 const firstName = userMetadata?.given_name || fullName.split(' ')[0] || 'User';
                 const lastName = userMetadata?.family_name || fullName.split(' ').slice(1).join(' ') || '';
@@ -89,8 +115,8 @@ const AuthCallback: React.FC = () => {
                 const { error: customerError } = await supabase
                   .from('customer')
                   .insert([{
-                    id: data.session.user.id,
-                    auth_user_id: data.session.user.id,
+                    id: authData.session.user.id,
+                    auth_user_id: authData.session.user.id,
                     email: userEmail || '',
                     first_name: firstName,
                     last_name: lastName,
@@ -134,7 +160,7 @@ const AuthCallback: React.FC = () => {
           }
 
           // For existing users, just continue with login
-          console.log('User authenticated:', data.session.user);
+          console.log('User authenticated:', authData.session.user);
 
           // Redirect back to the original page
           const redirectUrl = localStorage.getItem('auth_redirect_url');
