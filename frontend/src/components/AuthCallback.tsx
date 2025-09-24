@@ -202,9 +202,23 @@ const AuthCallback: React.FC = () => {
               } else if (!existingCustomer) {
                 // Create new customer profile for new Google OAuth user
                 const userMetadata = authData.session.user.user_metadata;
+                console.log('🔍 Google user metadata:', userMetadata);
+
                 const fullName = userMetadata?.full_name || userMetadata?.name || '';
                 const firstName = userMetadata?.given_name || fullName.split(' ')[0] || 'User';
                 const lastName = userMetadata?.family_name || fullName.split(' ').slice(1).join(' ') || '';
+
+                // Extract additional Google profile data
+                const phoneNumber = userMetadata?.phone_number || userMetadata?.phone || null;
+                const dateOfBirth = userMetadata?.birthdate || userMetadata?.birthday || null;
+                const gender = userMetadata?.gender || 'prefer_not_to_say';
+                const profilePicture = userMetadata?.avatar_url || userMetadata?.picture || null;
+
+                // Calculate profile completion based on available data
+                let completionPercentage = 60; // Base for name + email
+                if (phoneNumber) completionPercentage += 15;
+                if (dateOfBirth) completionPercentage += 15;
+                if (gender && gender !== 'prefer_not_to_say') completionPercentage += 10;
 
                 const { error: customerError } = await supabase
                   .from('customer')
@@ -214,9 +228,11 @@ const AuthCallback: React.FC = () => {
                     email: userEmail || '',
                     first_name: firstName,
                     last_name: lastName,
-                    phone_number: null,
-                    gender: 'prefer_not_to_say',
-                    profile_completion_percentage: 80,
+                    phone_number: phoneNumber,
+                    date_of_birth: dateOfBirth,
+                    gender: gender,
+                    profile_picture_url: profilePicture,
+                    profile_completion_percentage: completionPercentage,
                     account_status: 'active',
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
