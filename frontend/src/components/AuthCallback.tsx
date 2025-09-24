@@ -44,8 +44,40 @@ const AuthCallback: React.FC = () => {
           }
         }
 
-        // First, try to get the session from the URL hash (OAuth callback)
-        const { data: authData, error: authError } = await supabase.auth.getSession();
+        console.log('🔄 Processing OAuth callback, URL:', window.location.href);
+
+        // For production OAuth callbacks, we need to exchange tokens from URL
+        let authData, authError;
+
+        // Check if this is an OAuth callback with tokens in URL
+        if (window.location.hash.includes('access_token') || window.location.search.includes('code=')) {
+          console.log('🔄 OAuth tokens detected in URL, processing callback...');
+
+          // Process OAuth callback and get session from URL tokens
+          try {
+            const { data: sessionFromUrl, error: urlError } = await supabase.auth.getSession();
+
+            if (urlError) {
+              console.error('❌ Error getting session from URL:', urlError);
+              authData = { session: null };
+              authError = urlError;
+            } else {
+              console.log('✅ Session from OAuth callback:', !!sessionFromUrl.session);
+              authData = sessionFromUrl;
+              authError = null;
+            }
+          } catch (error) {
+            console.error('❌ Exception processing OAuth callback:', error);
+            authData = { session: null };
+            authError = error as any;
+          }
+        } else {
+          console.log('🔄 No OAuth tokens in URL, checking existing session...');
+          // Normal session check
+          const result = await supabase.auth.getSession();
+          authData = result.data;
+          authError = result.error;
+        }
 
         if (authError) {
           console.error('Auth callback error:', authError);
@@ -55,9 +87,21 @@ const AuthCallback: React.FC = () => {
 
         // If no session, try to get user directly (might be OAuth flow)
         if (!authData.session) {
-          const { data: userData, error: userError } = await supabase.auth.getUser();
+          console.log('🔄 No session found, trying getUser() as fallback...');
 
-          if (userError || !userData.user) {
+          // Wait a bit for Supabase to process OAuth callback automatically
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Try to get session again after waiting
+          const { data: retrySessionData } = await supabase.auth.getSession();
+          if (retrySessionData.session) {
+            console.log('✅ Session found after retry!');
+            authData = retrySessionData;
+          } else {
+            // Fallback to getUser
+            const { data: userData, error: userError } = await supabase.auth.getUser();
+
+            if (userError || !userData.user) {
             console.error('No session or user found:', userError);
             navigate('/?error=no_session');
             return;
@@ -76,6 +120,7 @@ const AuthCallback: React.FC = () => {
             navigate('/');
           }
           return;
+          }
         }
 
         if (authData.session) {
