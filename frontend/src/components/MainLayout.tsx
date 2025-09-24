@@ -14,10 +14,14 @@ const MainLayoutContent: React.FC = () => {
   const [showProfileSetup, setShowProfileSetup] = useState(false);
 
   useEffect(() => {
+    console.log('🔍 MainLayout check:', { user: !!user, loading, customer: !!customer });
+
     // Show profile setup modal if user is authenticated but has no customer profile
     if (user && !loading && !customer) {
+      console.log('❌ Showing profile setup - no customer profile found');
       setShowProfileSetup(true);
     } else {
+      console.log('✅ Not showing profile setup');
       setShowProfileSetup(false);
     }
   }, [user, customer, loading]);

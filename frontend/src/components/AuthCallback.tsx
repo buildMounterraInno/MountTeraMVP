@@ -203,6 +203,7 @@ const AuthCallback: React.FC = () => {
                 // Create new customer profile for new Google OAuth user
                 const userMetadata = authData.session.user.user_metadata;
                 console.log('🔍 Google user metadata:', userMetadata);
+                console.log('🔍 Creating new customer profile for Google OAuth user');
 
                 const fullName = userMetadata?.full_name || userMetadata?.name || '';
                 const firstName = userMetadata?.given_name || fullName.split(' ')[0] || 'User';
@@ -219,6 +220,15 @@ const AuthCallback: React.FC = () => {
                 // Set profile completion to 100% for Google OAuth users
                 // They have all essential information (name, email) and we set sensible defaults
                 const completionPercentage = 100;
+
+                console.log('🔍 Inserting customer profile with data:', {
+                  first_name: firstName,
+                  last_name: lastName,
+                  email: userEmail,
+                  date_of_birth: dateOfBirth,
+                  gender: gender,
+                  profile_completion_percentage: completionPercentage
+                });
 
                 const { error: customerError } = await supabase
                   .from('customer')
