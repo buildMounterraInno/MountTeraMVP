@@ -62,7 +62,8 @@ const AuthCallback: React.FC = () => {
         console.log('🔄 Waiting for Supabase OAuth processing...');
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        let authData, authError;
+        let authData: { session: any } | null = null;
+        let authError: any = null;
         let retryCount = 0;
         const maxRetries = 5;
 
@@ -74,7 +75,7 @@ const AuthCallback: React.FC = () => {
           authData = result.data;
           authError = result.error;
 
-          if (authData.session) {
+          if (authData?.session) {
             console.log('✅ Session found on attempt', retryCount + 1);
             break;
           }
@@ -98,7 +99,7 @@ const AuthCallback: React.FC = () => {
         }
 
         // If no session, try to get user directly (might be OAuth flow)
-        if (!authData.session) {
+        if (!authData?.session) {
           console.log('🔄 No session found, trying getUser() as fallback...');
 
           // Wait a bit for Supabase to process OAuth callback automatically
@@ -135,7 +136,7 @@ const AuthCallback: React.FC = () => {
           }
         }
 
-        if (authData.session) {
+        if (authData?.session) {
           // For new Google OAuth users, set portal_type to customer and create profile
           const userPortalType = authData.session.user.user_metadata?.portal_type;
 
