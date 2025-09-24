@@ -8,6 +8,42 @@ const AuthCallback: React.FC = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const callbackType = urlParams.get('type');
+
+        // Check if this is a password recovery callback
+        if (callbackType === 'recovery') {
+          console.log('🔄 [DEBUG] Password recovery callback detected');
+
+          // Check if we have a stored new password
+          const tempPasswordData = localStorage.getItem('temp_new_password');
+
+          if (tempPasswordData) {
+            try {
+              const passwordInfo = JSON.parse(tempPasswordData);
+              console.log('🟡 [DEBUG] Found stored password for:', passwordInfo.email);
+
+              // Update the password using Supabase's updateUser
+              const { error: updateError } = await supabase.auth.updateUser({
+                password: passwordInfo.password
+              });
+
+              if (updateError) {
+                console.error('❌ [DEBUG] Password update failed:', updateError);
+                navigate('/?error=password_update_failed');
+              } else {
+                console.log('✅ [DEBUG] Password updated successfully!');
+                localStorage.removeItem('temp_new_password');
+                navigate('/?success=password_updated');
+              }
+              return;
+            } catch (error) {
+              console.error('❌ [DEBUG] Error processing stored password:', error);
+              localStorage.removeItem('temp_new_password');
+            }
+          }
+        }
+
         // First, try to get the session from the URL hash (OAuth callback)
         const { data: authData, error: authError } = await supabase.auth.getSession();
 

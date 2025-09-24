@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { signIn, resetPassword } from '../lib/auth';
+import { signIn } from '../lib/auth';
 import SignupForm from './SignupForm';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import GoogleSSOButton from './GoogleSSOButton';
@@ -22,7 +22,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     password?: string;
     general?: string;
   }>({});
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   const handleClose = () => {
@@ -30,7 +29,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setTimeout(() => {
       setIsClosing(false);
       setErrors({});
-      setShowForgotPassword(false);
       setEmail('');
       setPassword('');
       onClose();
@@ -70,19 +68,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     }
 
     try {
-      if (showForgotPassword) {
-        const { error } = await resetPassword(email);
-        if (error) {
-          if (error.message.toLowerCase().includes('email') || error.message.toLowerCase().includes('user not found')) {
-            setErrors({ email: 'Email address not found. Please check your email.' });
-          } else {
-            setErrors({ general: error.message });
-          }
-        } else {
-          setErrors({ general: 'Password reset email sent! Check your inbox.' });
-          setShowForgotPassword(false);
-        }
-      } else {
         // Proceed with sign-in directly
         const { user, error } = await signIn(email, password);
         if (error) {
@@ -109,7 +94,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           console.log('User signed in:', user);
           handleClose();
         }
-      }
     } catch (error) {
       setErrors({ general: 'An unexpected error occurred. Please try again.' });
       console.error('Auth error:', error);
@@ -185,7 +169,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               <>
                 {/* Title */}
                 <h2 className="font-tpc text-xl sm:text-2xl font-bold text-gray-800 text-center mb-4 sm:mb-6">
-                  {showForgotPassword ? 'Reset Password' : 'Login'}
+                  Login
                 </h2>
 
             {/* General Success/Info Messages */}
@@ -223,7 +207,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               {/* Password Field - Hide for forgot password */}
-              {!showForgotPassword && (
+              {(
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                     Password
@@ -255,7 +239,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               )}
 
               {/* Forgot Password */}
-              {!showForgotPassword && (
+              {(
                 <div className="text-right">
                   <button
                     type="button"
@@ -267,18 +251,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </div>
               )}
 
-              {/* Back to login */}
-              {showForgotPassword && (
-                <div className="text-right">
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(false)}
-                    className="text-sm text-[#1E63EF] hover:text-[#E31E56] font-medium transition-colors duration-200"
-                  >
-                    Back to Login
-                  </button>
-                </div>
-              )}
 
 
               {/* Submit Button */}
@@ -287,12 +259,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 disabled={loading}
                 className="w-full bg-[#1E63EF] hover:bg-[#E31E56] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 touch-manipulation text-base"
               >
-                {loading ? 'Loading...' : showForgotPassword ? 'Send Reset Email' : 'Login'}
+                {loading ? 'Loading...' : 'Login'}
               </button>
             </form>
 
             {/* Terms Disclaimer - Hide for forgot password */}
-            {!showForgotPassword && (
+            {(
               <div className="text-center mt-4 mb-4">
                 <p className="text-xs text-gray-500">
                   By logging in, you agree to our{' '}
@@ -310,7 +282,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             )}
 
             {/* Divider - Hide for forgot password */}
-            {!showForgotPassword && (
+            {(
               <>
                 <div className="flex items-center my-6">
                   <div className="flex-1 border-t border-gray-300"></div>

@@ -34,7 +34,8 @@ function App() {
       <Routes>
         {/* Auth callback route - outside MainLayout */}
         <Route path="/auth/callback" element={<AuthCallback />} />
-        
+
+
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<SearchResults />} />

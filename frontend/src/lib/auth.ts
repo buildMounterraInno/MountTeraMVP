@@ -160,40 +160,59 @@ export const getCurrentUser = async (): Promise<User | null> => {
   }
 };
 
-// Password reset
-export const resetPassword = async (email: string): Promise<{ error: AuthError | null }> => {
+// Send password reset token/OTP - same as before
+export const sendPasswordResetOTP = async (email: string): Promise<{ error: AuthError | null }> => {
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
 
     if (error) {
-      console.error('Password reset error:', error);
+      console.error('Send password reset OTP error:', error);
       return { error };
     }
 
     return { error: null };
   } catch (error) {
-    console.error('Password reset exception:', error);
+    console.error('Send password reset OTP exception:', error);
     return { error: error as AuthError };
   }
 };
 
-// Update password
-export const updatePassword = async (newPassword: string): Promise<{ error: AuthError | null }> => {
+// Verify OTP and update password
+export const verifyOTPAndUpdatePassword = async (
+  email: string,
+  token: string,
+  newPassword: string
+): Promise<{ error: AuthError | null }> => {
   try {
-    const { error } = await supabase.auth.updateUser({
+    // Verify the password reset token
+    const { data, error: verifyError } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'recovery'
+    });
+
+    if (verifyError) {
+      console.error('Password reset token verification error:', verifyError);
+      return { error: verifyError };
+    }
+
+    if (!data.user || !data.session) {
+      return { error: { message: 'Invalid or expired reset code', name: 'AuthError', status: 400 } as AuthError };
+    }
+
+    // Update password after successful token verification
+    const { error: updateError } = await supabase.auth.updateUser({
       password: newPassword
     });
 
-    if (error) {
-      console.error('Update password error:', error);
-      return { error };
+    if (updateError) {
+      console.error('Update password error:', updateError);
+      return { error: updateError };
     }
 
     return { error: null };
   } catch (error) {
-    console.error('Update password exception:', error);
+    console.error('Verify token and update password exception:', error);
     return { error: error as AuthError };
   }
 };
@@ -212,11 +231,12 @@ export const checkEmailExists = async (_email: string): Promise<{ exists: boolea
 };
 
 
+
 // Force update user metadata
 export const forceUpdateUserMetadata = async (): Promise<{ error: AuthError | null }> => {
   try {
     const { error } = await supabase.auth.updateUser({
-      data: { 
+      data: {
         portal_type: 'customer',
         updated_at: new Date().toISOString()
       }

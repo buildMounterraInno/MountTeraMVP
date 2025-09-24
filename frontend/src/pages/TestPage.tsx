@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import OTPDebugger from '../components/OTPDebugger';
 
 interface TestData {
   success: boolean;
@@ -107,6 +108,11 @@ export default function TestPage() {
             <p><strong>Environment:</strong> {import.meta.env.MODE || 'Unknown'}</p>
             <p><strong>Table:</strong> articles</p>
           </div>
+        </div>
+
+        {/* OTP Debug Component */}
+        <div className="mt-8">
+          <OTPDebugger />
         </div>
       </div>
     </div>
