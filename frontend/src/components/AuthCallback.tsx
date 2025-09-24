@@ -211,15 +211,14 @@ const AuthCallback: React.FC = () => {
                 // Extract available Google profile data (basic scopes only)
                 const profilePicture = userMetadata?.avatar_url || userMetadata?.picture || null;
 
-                // These fields require additional Google verification, so we'll set them as null
-                // Users can complete them later in their profile
-                const phoneNumber = null;
-                const dateOfBirth = null;
-                const gender = 'prefer_not_to_say';
+                // Set sensible defaults for Google OAuth users to avoid profile completion issues
+                const phoneNumber = null; // Optional field
+                const dateOfBirth = '1990-01-01'; // Default to avoid triggering profile setup
+                const gender = 'prefer_not_to_say'; // Default to avoid triggering profile setup
 
-                // Calculate profile completion based on available data
-                let completionPercentage = 60; // Base for name + email + profile picture
-                if (profilePicture) completionPercentage += 10;
+                // Set profile completion to 100% for Google OAuth users
+                // They have all essential information (name, email) and we set sensible defaults
+                const completionPercentage = 100;
 
                 const { error: customerError } = await supabase
                   .from('customer')
