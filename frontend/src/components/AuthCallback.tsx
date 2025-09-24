@@ -208,17 +208,18 @@ const AuthCallback: React.FC = () => {
                 const firstName = userMetadata?.given_name || fullName.split(' ')[0] || 'User';
                 const lastName = userMetadata?.family_name || fullName.split(' ').slice(1).join(' ') || '';
 
-                // Extract additional Google profile data
-                const phoneNumber = userMetadata?.phone_number || userMetadata?.phone || null;
-                const dateOfBirth = userMetadata?.birthdate || userMetadata?.birthday || null;
-                const gender = userMetadata?.gender || 'prefer_not_to_say';
+                // Extract available Google profile data (basic scopes only)
                 const profilePicture = userMetadata?.avatar_url || userMetadata?.picture || null;
 
+                // These fields require additional Google verification, so we'll set them as null
+                // Users can complete them later in their profile
+                const phoneNumber = null;
+                const dateOfBirth = null;
+                const gender = 'prefer_not_to_say';
+
                 // Calculate profile completion based on available data
-                let completionPercentage = 60; // Base for name + email
-                if (phoneNumber) completionPercentage += 15;
-                if (dateOfBirth) completionPercentage += 15;
-                if (gender && gender !== 'prefer_not_to_say') completionPercentage += 10;
+                let completionPercentage = 60; // Base for name + email + profile picture
+                if (profilePicture) completionPercentage += 10;
 
                 const { error: customerError } = await supabase
                   .from('customer')

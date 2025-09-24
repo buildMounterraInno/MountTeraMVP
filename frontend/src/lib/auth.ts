@@ -86,7 +86,7 @@ export const signInWithGoogle = async (): Promise<{ error: AuthError | null }> =
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: 'openid profile email https://www.googleapis.com/auth/user.birthday.read https://www.googleapis.com/auth/user.gender.read https://www.googleapis.com/auth/user.phonenumbers.read',
+        scopes: 'openid profile email',
         queryParams: {
           portal_type: 'customer' // Set portal type for Google OAuth
         }
