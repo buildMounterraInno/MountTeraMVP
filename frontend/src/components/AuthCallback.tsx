@@ -8,8 +8,20 @@ const AuthCallback: React.FC = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log('🔄 AuthCallback started, URL:', window.location.href);
+
         const urlParams = new URLSearchParams(window.location.search);
         const callbackType = urlParams.get('type');
+
+        // Check for OAuth errors in URL
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+
+        if (error) {
+          console.error('❌ OAuth error in URL:', error, errorDescription);
+          navigate(`/?error=oauth_failed&message=${encodeURIComponent(errorDescription || error)}`);
+          return;
+        }
 
         // Check if this is a password recovery callback
         if (callbackType === 'recovery') {
@@ -46,37 +58,37 @@ const AuthCallback: React.FC = () => {
 
         console.log('🔄 Processing OAuth callback, URL:', window.location.href);
 
-        // For production OAuth callbacks, we need to exchange tokens from URL
+        // Wait for Supabase to automatically process OAuth callback
+        console.log('🔄 Waiting for Supabase OAuth processing...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         let authData, authError;
+        let retryCount = 0;
+        const maxRetries = 5;
 
-        // Check if this is an OAuth callback with tokens in URL
-        if (window.location.hash.includes('access_token') || window.location.search.includes('code=')) {
-          console.log('🔄 OAuth tokens detected in URL, processing callback...');
+        // Retry getting session multiple times
+        while (retryCount < maxRetries) {
+          console.log(`🔄 Attempt ${retryCount + 1}/${maxRetries} to get session...`);
 
-          // Process OAuth callback and get session from URL tokens
-          try {
-            const { data: sessionFromUrl, error: urlError } = await supabase.auth.getSession();
-
-            if (urlError) {
-              console.error('❌ Error getting session from URL:', urlError);
-              authData = { session: null };
-              authError = urlError;
-            } else {
-              console.log('✅ Session from OAuth callback:', !!sessionFromUrl.session);
-              authData = sessionFromUrl;
-              authError = null;
-            }
-          } catch (error) {
-            console.error('❌ Exception processing OAuth callback:', error);
-            authData = { session: null };
-            authError = error as any;
-          }
-        } else {
-          console.log('🔄 No OAuth tokens in URL, checking existing session...');
-          // Normal session check
           const result = await supabase.auth.getSession();
           authData = result.data;
           authError = result.error;
+
+          if (authData.session) {
+            console.log('✅ Session found on attempt', retryCount + 1);
+            break;
+          }
+
+          if (authError) {
+            console.error('❌ Session error on attempt', retryCount + 1, ':', authError);
+            break;
+          }
+
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.log('🔄 No session yet, waiting 1 second...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
         }
 
         if (authError) {
@@ -268,7 +280,8 @@ const AuthCallback: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E63EF] mx-auto mb-4"></div>
-        <p className="text-gray-600">Completing authentication...</p>
+        <p className="text-gray-600">Processing Google authentication...</p>
+        <p className="text-sm text-gray-400 mt-2">This may take a few seconds</p>
       </div>
     </div>
   );
