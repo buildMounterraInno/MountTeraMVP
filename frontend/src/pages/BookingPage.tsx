@@ -95,6 +95,17 @@ const BookingPage: React.FC = () => {
   >('register');
   const [bookingStatusLoading, setBookingStatusLoading] = useState(false);
 
+  // Payment status states
+  const [paymentStatus, setPaymentStatus] = useState<
+    'idle' | 'pending' | 'completed' | 'failed'
+  >('idle');
+  const [paymentStatusLoading, setPaymentStatusLoading] = useState(false);
+  const [merchantOrderId, setMerchantOrderId] = useState<string>('');
+  const [paymentPollingInterval, setPaymentPollingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [paymentExpireTime, setPaymentExpireTime] = useState<Date | null>(null);
+  const [paymentTimeoutTimer, setPaymentTimeoutTimer] = useState<NodeJS.Timeout | null>(null);
+  const [frontendTimeoutTime, setFrontendTimeoutTime] = useState<Date | null>(null);
+
   // Login modal state
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -246,6 +257,217 @@ const BookingPage: React.FC = () => {
     }
 
     return true;
+  };
+
+  // Stop payment polling and timeout
+  const stopPaymentPolling = () => {
+    if (paymentPollingInterval) {
+      clearInterval(paymentPollingInterval);
+      setPaymentPollingInterval(null);
+      console.log('🛑 Payment polling stopped');
+    }
+    if (paymentTimeoutTimer) {
+      clearTimeout(paymentTimeoutTimer);
+      setPaymentTimeoutTimer(null);
+      console.log('⏰ Payment timeout timer cleared');
+    }
+  };
+
+  // Check payment status with polling mechanism
+  const checkPaymentStatus = async (merchantOrderId: string, isPolling = false) => {
+    if (!merchantOrderId || !user) {
+      console.log('⏭️ Skipping payment status check - missing requirements');
+      return;
+    }
+
+    // Only show loading on initial check, not during polling
+    if (!isPolling) {
+      setPaymentStatusLoading(true);
+    }
+
+    try {
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        console.error('No auth token found');
+        if (!isPolling) setPaymentStatusLoading(false);
+        return;
+      }
+
+      const baseUrl = import.meta.env.VITE_VASTUSETU_API_BASE_URL || 'https://www.vastusetu.com';
+      const response = await fetch(`${baseUrl}/api/payment/getOrderStatus`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          merchantOrderId: merchantOrderId
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Payment status check failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log(`💳 Payment status result${isPolling ? ' (polling)' : ''}:`, result);
+
+      if (result.success && result.data) {
+        const orderState = result.data.state;
+        const expireAt = result.data.expireAt; // Get expireAt field from API response
+
+        // Store expireAt for timeout handling - update it each time we get a new value
+        if (expireAt) {
+          const expireDate = new Date(expireAt);
+          const currentTime = new Date();
+
+          // Always update the expiry time
+          setPaymentExpireTime(expireDate);
+          console.log('⏰ Payment expiry time updated:', {
+            expireAt: expireDate.toISOString(),
+            currentTime: currentTime.toISOString(),
+            timeToExpiry: Math.round((expireDate.getTime() - currentTime.getTime()) / 1000) + ' seconds',
+            isExpired: currentTime > expireDate
+          });
+
+          // Check if already expired
+          if (currentTime > expireDate) {
+            console.log('⏰ Payment already expired based on API response!');
+            stopPaymentPolling();
+            setPaymentStatus('failed');
+            return;
+          }
+        }
+
+        if (orderState === 'COMPLETED') {
+          console.log('✅ Payment COMPLETED - stopping polling');
+          stopPaymentPolling();
+          setPaymentStatus('completed');
+
+          // Send payment confirmation email via ZeptoMail
+          try {
+            console.log('📧 Sending payment confirmation email...');
+
+            const customerName = personalDetails.name || customer?.first_name || user.user_metadata?.full_name || 'Customer';
+            const customerEmail = personalDetails.email || customer?.email || user.email || '';
+
+            const emailPayload = {
+              from: { address: "noreply@trippechalo.in" },
+              to: [{
+                email_address: {
+                  address: customerEmail,
+                  name: customerName
+                }
+              }],
+              subject: `Payment Confirmed - ${eventDetails?.event_name || 'Event Booking'}`,
+              htmlbody: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h2 style="color: #1E63EF;">Payment Confirmed! 🎉</h2>
+                  <p>Dear <b>${customerName}</b>,</p>
+                  <p>Your payment has been successfully processed for:</p>
+
+                  <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="margin: 0 0 10px 0;">${eventDetails?.event_name || 'Event'}</h3>
+                    <p style="margin: 5px 0;"><b>Date:</b> ${eventDetails?.formattedDate || 'TBD'}</p>
+                    <p style="margin: 5px 0;"><b>Location:</b> ${eventDetails?.address_full_address || 'TBD'}</p>
+                    <p style="margin: 5px 0;"><b>Order ID:</b> ${result.data.orderId || merchantOrderId}</p>
+                    <p style="margin: 5px 0;"><b>Amount:</b> ₹${(result.data.amount / 100).toLocaleString()}</p>
+                  </div>
+
+                  <p>Your booking is confirmed! We'll send you the event details shortly.</p>
+                  <p>Thank you for choosing Trip Pe Chalo!</p>
+
+                  <hr style="margin: 30px 0;">
+                  <p style="font-size: 12px; color: #666;">
+                    This is an automated email. Please do not reply to this message.
+                  </p>
+                </div>
+              `
+            };
+
+            const emailResponse = await fetch('https://api.zeptomail.in/v1.1/email', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Zoho-enczapikey PHtE6r1fR+Hs2mUv80AIs6C4FsChYIIrqL9uegROstpBCfIGTU1dq9orlmXj+Rt5VPRKQqbIzd9stemZ5+KGdz3pMm9PCWqyqK3sx/VYSPOZsbq6x00ftFgSd0LdVYDqetJv0CDTvtbdNA=='
+              },
+              body: JSON.stringify(emailPayload)
+            });
+
+            if (emailResponse.ok) {
+              console.log('✅ Payment confirmation email sent successfully');
+            } else {
+              const emailError = await emailResponse.json();
+              console.warn('⚠️ Payment confirmation email failed:', emailError);
+            }
+          } catch (emailError) {
+            console.error('❌ Error sending payment confirmation email:', emailError);
+          }
+
+        } else if (orderState === 'FAILED') {
+          console.log('❌ Payment FAILED - stopping polling');
+          stopPaymentPolling();
+          setPaymentStatus('failed');
+
+        } else if (orderState === 'PENDING') {
+          console.log('⏳ Payment still PENDING');
+          setPaymentStatus('pending');
+
+          // Check if payment has expired based on our 3-minute frontend timeout
+          const currentTime = new Date();
+          if (frontendTimeoutTime && currentTime > frontendTimeoutTime) {
+            console.log('⏰ Frontend timeout expired during PENDING check:', {
+              currentTime: currentTime.toISOString(),
+              frontendTimeout: frontendTimeoutTime.toISOString(),
+              expiredBy: Math.round((currentTime.getTime() - frontendTimeoutTime.getTime()) / 1000) + ' seconds'
+            });
+            stopPaymentPolling();
+            setPaymentStatus('failed');
+            return;
+          }
+
+          // Start polling if not already started and not expired
+          if (!paymentPollingInterval && !isPolling) {
+            console.log('🔄 Starting payment status polling (every 10 seconds)');
+
+            const intervalId = setInterval(() => {
+              // Check frontend timeout before each poll
+              const currentTime = new Date();
+              if (frontendTimeoutTime && currentTime > frontendTimeoutTime) {
+                console.log('⏰ Frontend timeout expired during polling interval:', {
+                  currentTime: currentTime.toISOString(),
+                  frontendTimeout: frontendTimeoutTime.toISOString(),
+                  expiredBy: Math.round((currentTime.getTime() - frontendTimeoutTime.getTime()) / 1000) + ' seconds'
+                });
+                clearInterval(intervalId);
+                setPaymentPollingInterval(null);
+                setPaymentStatus('failed');
+                return;
+              }
+
+              console.log('🔄 Polling payment status... Frontend time remaining:',
+                frontendTimeoutTime ? Math.round((frontendTimeoutTime.getTime() - currentTime.getTime()) / 1000) + ' seconds' : 'unknown'
+              );
+              checkPaymentStatus(merchantOrderId, true);
+            }, 10000); // Poll every 10 seconds
+
+            setPaymentPollingInterval(intervalId);
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      if (!isPolling) {
+        setPaymentStatus('failed');
+      }
+    } finally {
+      if (!isPolling) {
+        setPaymentStatusLoading(false);
+      }
+    }
   };
 
   // Check booking status for screening events
@@ -419,9 +641,92 @@ const BookingPage: React.FC = () => {
   //   }
   // };
 
+  // PhonePe checkout function
+  const openPhonePeCheckout = (tokenUrl: string, merchantOrderId: string) => {
+    console.log('📱 Initiating PhonePe checkout:', tokenUrl);
+
+    // Payment callback function
+    const paymentCallback = (response: string) => {
+      console.log('🚨 ===== PHONEPE CALLBACK RECEIVED ===== 🚨');
+      console.log('📞 Callback Response:', response);
+      console.log('📞 Merchant Order ID:', merchantOrderId);
+
+      if (response === 'USER_CANCEL') {
+        console.log('❌ USER_CANCEL: Payment cancelled by user');
+        setPaymentStatus('failed');
+        alert('Payment was cancelled. You can try again if needed.');
+      } else if (response === 'CONCLUDED') {
+        console.log('✅ CONCLUDED: Payment process finished, starting status polling...');
+        setPaymentStatus('pending');
+
+        // Set frontend timeout to 4 minutes from now (ignore API's long expiry)
+        const frontendExpiry = new Date(Date.now() + 4 * 60 * 1000); // 4 minutes
+        setFrontendTimeoutTime(frontendExpiry);
+        console.log('⏰ Frontend timeout set to:', frontendExpiry.toLocaleString());
+
+        // Start 4-minute timeout timer
+        const timeoutId = setTimeout(() => {
+          console.log('⏰ 4-minute frontend timeout reached - stopping polling');
+          stopPaymentPolling();
+          setPaymentStatus('failed');
+        }, 4 * 60 * 1000); // 4 minutes
+
+        setPaymentTimeoutTimer(timeoutId);
+
+        // Start checking payment status after callback (wait 2 seconds then start polling)
+        setTimeout(() => {
+          checkPaymentStatus(merchantOrderId);
+        }, 2000);
+
+      } else {
+        console.log('⚠️ UNKNOWN RESPONSE:', response);
+        alert(`Unknown callback received: ${response}`);
+      }
+
+      console.log('🚨 ===== END PHONEPE CALLBACK ===== 🚨');
+    };
+
+    // Check if PhonePeCheckout is available
+    if (window.PhonePeCheckout && window.PhonePeCheckout.transact) {
+      console.log('🚀 Opening PhonePe iFrame...');
+
+      window.PhonePeCheckout.transact({
+        tokenUrl: tokenUrl,
+        callback: paymentCallback,
+        type: 'IFRAME'
+      });
+    } else {
+      console.error('❌ PhonePeCheckout not available');
+      alert('PhonePe checkout is not available. Please try again or use a different browser.');
+    }
+  };
+
   // Create payment request
   const handlePaymentRequest = async () => {
+    console.log('💳 Payment request initiated:', {
+      hasUser: !!user,
+      hasCustomer: !!customer,
+      hasEventDetails: !!eventDetails,
+      hasId: !!id,
+      eventType: type,
+      isScreeningAllowed: eventDetails?.is_screening_allowed,
+      bookingStatus
+    });
+
     if (!user || !customer || !eventDetails || !id) {
+      console.error('❌ Missing required data for payment:', {
+        user: !!user,
+        customer: !!customer,
+        eventDetails: !!eventDetails,
+        id: !!id
+      });
+
+      if (!user) {
+        console.log('🔐 User not logged in, showing login modal');
+        setShowLoginModal(true);
+        return;
+      }
+
       alert('Missing required information for payment. Please try again.');
       return;
     }
@@ -467,27 +772,24 @@ const BookingPage: React.FC = () => {
         }
       }
 
-      // Prepare API payload
+      // Prepare API payload with new structure
       const paymentPayload = {
         amount: totalAmount,
+        paymentMessage: "Payment Request for Event",
+        paymentType: "PG_CHECKOUT",
+        paymentRedirectUrl: `${window.location.origin}/booking/event/${id}`,
         metaInfo: {
           udf1: id, // event id
-          udf2: customer.id, // customer id
-          udf3: eventDetails.vendor_id, // vendor id
-          udf4: bookingId // booking id (null for direct bookings)
-        },
-        paymentFlow: {
-          type: "PG_CHECKOUT",
-          message: "Payment Request for Event",
-          merchantUrls: {
-            redirectUrl: `${window.location.origin}/booking/event/${id}`
-          }
+          udf2: eventDetails.vendor_id, // vendor id
+          udf3: bookingId || "", // booking id (screening events only, empty for direct)
+          udf4: "",
+          udf5: ""
         }
       };
 
       // API Base URL
       const baseUrl = import.meta.env.VITE_VASTUSETU_API_BASE_URL || 'https://www.vastusetu.com';
-      const apiUrl = `${baseUrl}/api/create-payment-request`;
+      const apiUrl = `${baseUrl}/api/payment/createPaymentRequest`;
 
       // Log the request details
       console.log('🔄 Creating payment request:', {
@@ -500,6 +802,9 @@ const BookingPage: React.FC = () => {
         customerId: customer.id,
         vendorId: eventDetails.vendor_id,
         bookingId,
+        paymentMessage: "Payment Request for Event",
+        paymentType: "PG_CHECKOUT",
+        paymentRedirectUrl: `${window.location.origin}/booking/event/${id}`,
         hasToken: !!session.access_token
       });
 
@@ -528,6 +833,8 @@ curl --location '${apiUrl}' \\
         data: responseData
       });
 
+      console.log('🔍 RAW API Response Data:', JSON.stringify(responseData, null, 2));
+
       if (!response.ok) {
         console.error('❌ Payment request failed:', responseData);
         alert(`Payment request failed: ${responseData.message || responseData.error || 'Unknown error'}`);
@@ -536,10 +843,26 @@ curl --location '${apiUrl}' \\
 
       console.log('✅ Payment request successful!', responseData);
 
-      // If successful, redirect to PhonePe checkout URL
-      if (responseData.data?.instrumentResponse?.redirectInfo?.url) {
-        console.log('🔗 Redirecting to PhonePe checkout:', responseData.data.instrumentResponse.redirectInfo.url);
-        window.location.href = responseData.data.instrumentResponse.redirectInfo.url;
+      // Check for redirectUrl in the new response structure
+      if (responseData.success && responseData.data?.redirectUrl) {
+        const tokenUrl = responseData.data.redirectUrl;
+        const merchantOrderId = responseData.data?.merchantOrderId || '';
+
+        console.log('🔗 Opening PhonePe iFrame with tokenUrl:', tokenUrl);
+        console.log('🏪 Merchant Order ID from API response:', merchantOrderId);
+
+        if (!merchantOrderId) {
+          console.error('❌ No merchantOrderId in response:', responseData);
+          alert('Payment setup failed. No merchant order ID received.');
+          return;
+        }
+
+        // Store ONLY merchant order ID for status checking
+        setMerchantOrderId(merchantOrderId);
+        console.log('💾 Stored Merchant Order ID for tracking:', merchantOrderId);
+
+        // Open PhonePe checkout in iFrame mode
+        openPhonePeCheckout(tokenUrl, merchantOrderId);
       } else {
         console.error('❌ No redirect URL in response:', responseData);
         alert('Payment setup failed. No redirect URL received.');
@@ -787,6 +1110,28 @@ curl --location '${apiUrl}' \\
       setShowLoginModal(false);
     }
   }, [user, showLoginModal]);
+
+  // Check payment status on page load if merchantOrderId exists
+  useEffect(() => {
+    if (merchantOrderId && user) {
+      console.log('🔄 Checking payment status on page load:', merchantOrderId);
+      checkPaymentStatus(merchantOrderId);
+    }
+  }, [merchantOrderId, user]);
+
+  // Cleanup polling interval and timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (paymentPollingInterval) {
+        console.log('🧹 Cleaning up payment polling interval on component unmount');
+        clearInterval(paymentPollingInterval);
+      }
+      if (paymentTimeoutTimer) {
+        console.log('🧹 Cleaning up payment timeout timer on component unmount');
+        clearTimeout(paymentTimeoutTimer);
+      }
+    };
+  }, [paymentPollingInterval, paymentTimeoutTimer]);
 
   if (loading) {
     return (
@@ -1175,6 +1520,90 @@ curl --location '${apiUrl}' \\
                 </div>
               )}
 
+              {/* Payment Status Messages */}
+              {paymentStatus === 'pending' && (
+                <div className="mb-6 rounded-xl bg-white p-4">
+                  <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4">
+                    <div className="text-center">
+                      <div className="mb-2 text-2xl">⏳</div>
+                      <h3 className="mb-1 font-bold text-yellow-800">
+                        Payment Processing
+                      </h3>
+                      <p className="text-sm text-yellow-700">
+                        {paymentPollingInterval
+                          ? "We're checking your payment status every 10 seconds. Please don't close this page."
+                          : "Your payment is being processed. Please wait..."
+                        }
+                      </p>
+                      {frontendTimeoutTime && (
+                        <div className="mt-2 space-y-1">
+                          <p className="text-xs text-yellow-600">
+                            We'll check your payment for: {Math.max(0, Math.round((frontendTimeoutTime.getTime() - new Date().getTime()) / 1000))} seconds
+                          </p>
+                          <p className="text-xs text-yellow-500">
+                            (If it takes longer, please contact support)
+                          </p>
+                        </div>
+                      )}
+                      {(paymentStatusLoading || paymentPollingInterval) && (
+                        <div className="mt-2 flex justify-center">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-yellow-600 border-t-transparent" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {paymentStatus === 'completed' && (
+                <div className="mb-6 rounded-xl bg-white p-4">
+                  <div className="rounded-xl border border-green-200 bg-green-50 p-4">
+                    <div className="text-center">
+                      <div className="mb-2 text-2xl">🎉</div>
+                      <h3 className="mb-1 font-bold text-green-800">
+                        Payment Successful!
+                      </h3>
+                      <p className="text-sm text-green-700">
+                        Your booking is confirmed. Check your email for the ticket.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {paymentStatus === 'failed' && (
+                <div className="mb-6 rounded-xl bg-white p-4">
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                    <div className="text-center space-y-3">
+                      <div className="text-2xl">❌</div>
+                      <h3 className="font-bold text-red-800">
+                        Payment Failed
+                      </h3>
+                      <p className="text-sm text-red-700">
+                        {paymentTimeoutTimer === null && !paymentPollingInterval
+                          ? "Payment took too long to process or failed. You can try again."
+                          : paymentExpireTime && new Date() > paymentExpireTime
+                          ? "Your payment session has expired. Please try again."
+                          : "Your payment could not be processed. Please try again."
+                        }
+                      </p>
+
+                      {/* Contact Information */}
+                      <div className="mt-3 p-3 bg-red-100 rounded-lg">
+                        <p className="text-xs font-semibold text-red-800 mb-2">Need Help? Reach out to us:</p>
+                        <div className="space-y-1 text-xs text-red-700">
+                          {(eventDetails.contact_number || eventDetails.emergency_contact_number) && (
+                            <p>📞 Phone: {eventDetails.contact_number || eventDetails.emergency_contact_number}</p>
+                          )}
+                          <p>📧 Email: support@trippechalo.in</p>
+                          <p className="mt-2 font-medium">We'll help you complete your booking!</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Registration Success Messages */}
               {bookingStatus === 'registered' && (
                 <div className="mb-6 rounded-xl bg-white p-4">
@@ -1225,7 +1654,14 @@ curl --location '${apiUrl}' \\
               )}
 
               {/* Book/Register/Pay Button */}
-              {bookingStatusLoading ? (
+              {paymentStatus === 'completed' ? (
+                <button
+                  disabled
+                  className="mb-4 w-full rounded-xl bg-green-600 py-4 text-lg font-semibold text-white"
+                >
+                  ✅ Booking Confirmed
+                </button>
+              ) : bookingStatusLoading ? (
                 <button
                   disabled
                   className="mb-4 flex w-full items-center justify-center rounded-xl bg-gray-400 py-4 text-lg font-semibold text-white"
@@ -1240,10 +1676,10 @@ curl --location '${apiUrl}' \\
                       ? handleRegistrationClick
                       : handlePaymentRequest
                   }
-                  disabled={paymentLoading}
+                  disabled={paymentLoading || paymentStatus === 'pending'}
                   className="mb-4 w-full rounded-xl bg-black py-4 text-lg font-semibold text-white transition-colors hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  {paymentLoading ? (
+                  {paymentLoading || paymentStatus === 'pending' ? (
                     <div className="flex items-center justify-center">
                       <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       Processing...
@@ -1257,10 +1693,10 @@ curl --location '${apiUrl}' \\
               ) : bookingStatus === 'approved' ? (
                 <button
                   onClick={handlePaymentRequest}
-                  disabled={paymentLoading}
+                  disabled={paymentLoading || paymentStatus === 'pending'}
                   className="mb-4 w-full rounded-xl bg-green-600 py-4 text-lg font-semibold text-white transition-colors hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  {paymentLoading ? (
+                  {paymentLoading || paymentStatus === 'pending' ? (
                     <div className="flex items-center justify-center">
                       <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       Processing...
@@ -1270,6 +1706,31 @@ curl --location '${apiUrl}' \\
                   )}
                 </button>
               ) : bookingStatus === 'rejected' ? null : null}
+
+              {/* Retry Payment Button for Failed Payments */}
+              {paymentStatus === 'failed' && (
+                <button
+                  onClick={() => {
+                    console.log('🔄 Retrying payment - resetting status to idle');
+                    setPaymentStatus('idle');
+                    setMerchantOrderId('');
+                    setPaymentExpireTime(null);
+                    setFrontendTimeoutTime(null);
+                    handlePaymentRequest();
+                  }}
+                  disabled={paymentLoading}
+                  className="mb-4 w-full rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white transition-colors hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {paymentLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Processing...
+                    </div>
+                  ) : (
+                    '🔄 Try Payment Again'
+                  )}
+                </button>
+              )}
 
               {bookingStatus !== 'approved' && bookingStatus !== 'rejected' && (
                 <div className="mb-6 rounded-xl bg-white p-4">

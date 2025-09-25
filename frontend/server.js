@@ -87,6 +87,81 @@ app.post('/api/send-registration-email', async (req, res) => {
   }
 });
 
+// Payment confirmation email endpoint
+app.post('/api/send-payment-confirmation', async (req, res) => {
+  try {
+    const { customerName, customerEmail, eventName, eventDate, eventAddress, orderId, amount } = req.body;
+
+    // Validate required fields
+    if (!customerName || !customerEmail || !eventName || !eventDate || !eventAddress || !orderId || !amount) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: customerName, customerEmail, eventName, eventDate, eventAddress, orderId, amount'
+      });
+    }
+
+    // Payment confirmation template ID
+    const PAYMENT_CONFIRMATION_TEMPLATE = '2518b.623682b2828bdc79.k1.64ec0c50-9a39-11f0-9d5f-525400c92439.1998207d195';
+
+    // Prepare ZeptoMail payload for payment confirmation
+    const emailPayload = {
+      from: {
+        address: "noreply@trippechalo.in",
+        name: "TrippeChalo"
+      },
+      to: [{
+        email_address: {
+          address: customerEmail,
+          name: customerName
+        }
+      }],
+      template_key: PAYMENT_CONFIRMATION_TEMPLATE,
+      merge_info: {
+        name: customerName,
+        "event name": eventName,
+        date: eventDate,
+        address: eventAddress,
+        "order id": orderId,
+        amount: (amount / 100).toFixed(2) // Convert paise to rupees
+      }
+    };
+
+    // Call ZeptoMail API
+    const response = await fetch(ZEPTO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': ZEPTO_API_KEY
+      },
+      body: JSON.stringify(emailPayload)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      const messageId = result.data?.[0]?.additional_info?.[0]?.message_id;
+
+      res.json({
+        success: true,
+        messageId,
+        data: result
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        error: result.message || result.error || 'Failed to send payment confirmation email'
+      });
+    }
+
+  } catch (error) => {
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
+    });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', service: 'ZeptoMail Proxy Server' });
@@ -95,7 +170,9 @@ app.get('/health', (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 ZeptoMail proxy server running on http://localhost:${PORT}`);
-  console.log(`📧 Email endpoint: http://localhost:${PORT}/api/send-registration-email`);
+  console.log(`📧 Registration email endpoint: http://localhost:${PORT}/api/send-registration-email`);
+  console.log(`💳 Payment confirmation endpoint: http://localhost:${PORT}/api/send-payment-confirmation`);
+  console.log(`🔍 Health check: http://localhost:${PORT}/health`);
 });
 
 export default app;
