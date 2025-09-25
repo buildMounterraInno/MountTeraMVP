@@ -3,7 +3,7 @@ import { X, Eye, EyeOff } from 'lucide-react';
 import { signIn } from '../lib/auth';
 import SignupForm from './SignupForm';
 import ForgotPasswordModal from './ForgotPasswordModal';
-import GoogleSSOButton from './GoogleSSOButton';
+// import GoogleSSOButton from './GoogleSSOButton';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -102,9 +102,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleGoogleError = (error: string) => {
-    setErrors({ general: error });
-  };
+  // const handleGoogleError = (error: string) => {
+  //   setErrors({ general: error });
+  // };
 
   // Handle escape key
   useEffect(() => {
@@ -282,7 +282,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             )}
 
             {/* Divider - Hide for forgot password */}
-            {(
+            {/* (
               <>
                 <div className="flex items-center my-6">
                   <div className="flex-1 border-t border-gray-300"></div>
@@ -291,14 +291,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Google SSO Button */}
-                <GoogleSSOButton
+                {/* <GoogleSSOButton
                   onError={handleGoogleError}
                   loading={loading}
                   setLoading={setLoading}
-                />
+                /> */}
 
                 {/* Toggle Login/Signup - Hide for forgot password */}
-                <div className="text-center mt-4 sm:mt-6">
+                {/* <div className="text-center mt-4 sm:mt-6">
                   <p className="text-sm text-gray-600">
                     Don't have an account?{' '}
                     <button
@@ -309,9 +309,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                       Create Account
                     </button>
                   </p>
-                </div>
-              </>
-            )}
+                </div> */}
+              {/* </>
+            )} */}
+
+            {/* Direct signup link without divider */}
+            <div className="text-center mt-4 sm:mt-6">
+              <p className="text-sm text-gray-600">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(true)}
+                  className="text-[#1E63EF] hover:text-[#E31E56] font-medium transition-colors duration-200 touch-manipulation"
+                >
+                  Create Account
+                </button>
+              </p>
+            </div>
               </>
             )}
           </div>

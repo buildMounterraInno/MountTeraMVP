@@ -11,7 +11,7 @@ import {
   Check,
 } from 'lucide-react';
 import { useCustomer } from '../contexts/CustomerContext';
-import GoogleSSOButton from './GoogleSSOButton';
+// import GoogleSSOButton from './GoogleSSOButton';
 
 interface SignupFormData {
   email: string;
@@ -358,9 +358,9 @@ const SignupForm: React.FC<SignupFormProps> = ({
     }
   };
 
-  const handleGoogleError = (error: string) => {
-    setErrors({ general: error });
-  };
+  // const handleGoogleError = (error: string) => {
+  //   setErrors({ general: error });
+  // };
 
   return (
     <div className="max-h-[95vh] overflow-y-auto sm:max-h-[80vh]">
@@ -662,18 +662,18 @@ const SignupForm: React.FC<SignupFormProps> = ({
         </button>
 
         {/* Divider */}
-        <div className="flex items-center my-4">
+        {/* <div className="flex items-center my-4">
           <div className="flex-1 border-t border-gray-300"></div>
           <span className="px-4 text-xs text-gray-500 sm:text-sm">or</span>
           <div className="flex-1 border-t border-gray-300"></div>
         </div>
 
         {/* Google SSO Button */}
-        <GoogleSSOButton
+        {/* <GoogleSSOButton
           onError={handleGoogleError}
           loading={isLoading}
           setLoading={setIsLoading}
-        />
+        /> */}
 
         {/* Switch to Login */}
         <div className="pt-2 text-center sm:pt-3">

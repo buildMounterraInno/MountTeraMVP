@@ -4,6 +4,7 @@ import { ArrowLeft, Heart, Share2 } from 'lucide-react';
 import { Calendar, MapPin, Clock, Camera, User } from 'phosphor-react';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useCustomer } from '../contexts/CustomerContext';
 import {
   NearbyApiService,
   DetailedEvent,
@@ -38,6 +39,7 @@ interface EventDetails {
   banner_image?: string;
   contact_name?: string;
   contact_number?: string;
+  vendor_id?: string;
 
   // Experience-specific fields
   sub_category?: string;
@@ -73,6 +75,7 @@ const BookingPage: React.FC = () => {
   const { addItemToWishlist, removeItemFromWishlist, isInWishlist } =
     useWishlist();
   const { user } = useAuth();
+  const { customer } = useCustomer();
 
   // Registration flow states
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
@@ -97,6 +100,9 @@ const BookingPage: React.FC = () => {
 
   // Long description expansion state
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  // Payment request loading state
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   // Email testing state
   //const [setEmailTestLoading] = useState(false);
@@ -413,6 +419,140 @@ const BookingPage: React.FC = () => {
   //   }
   // };
 
+  // Create payment request
+  const handlePaymentRequest = async () => {
+    if (!user || !customer || !eventDetails || !id) {
+      alert('Missing required information for payment. Please try again.');
+      return;
+    }
+
+    // Validate required fields
+    if (!eventDetails.vendor_id) {
+      alert('Event vendor information not available. Please contact support.');
+      return;
+    }
+
+    // Calculate total amount
+    const basePrice = type === 'event'
+      ? (eventDetails.fixed_price || 0)
+      : (eventDetails.ticket_price || 0);
+
+    if (!basePrice || basePrice <= 0) {
+      alert('Event pricing information not available. Please contact support.');
+      return;
+    }
+
+    const totalAmount = basePrice * guests;
+
+    setPaymentLoading(true);
+
+    try {
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        alert('Authentication required. Please log in again.');
+        return;
+      }
+
+      // Get booking ID if it exists (for screening events)
+      let bookingId = null;
+      if (eventDetails.is_screening_allowed && bookingStatus === 'approved') {
+        try {
+          const bookingResponse = await BookingApiService.checkBookingStatus(id);
+          if (bookingResponse.success && bookingResponse.data) {
+            bookingId = bookingResponse.data.id;
+          }
+        } catch (error) {
+          console.warn('Could not fetch booking ID:', error);
+        }
+      }
+
+      // Prepare API payload
+      const paymentPayload = {
+        amount: totalAmount,
+        metaInfo: {
+          udf1: id, // event id
+          udf2: customer.id, // customer id
+          udf3: eventDetails.vendor_id, // vendor id
+          udf4: bookingId // booking id (null for direct bookings)
+        },
+        paymentFlow: {
+          type: "PG_CHECKOUT",
+          message: "Payment Request for Event",
+          merchantUrls: {
+            redirectUrl: `${window.location.origin}/booking/event/${id}`
+          }
+        }
+      };
+
+      // API Base URL
+      const baseUrl = import.meta.env.VITE_VASTUSETU_API_BASE_URL || 'https://www.vastusetu.com';
+      const apiUrl = `${baseUrl}/api/create-payment-request`;
+
+      // Log the request details
+      console.log('🔄 Creating payment request:', {
+        apiUrl,
+        payload: paymentPayload,
+        totalAmount,
+        guests,
+        basePrice,
+        eventId: id,
+        customerId: customer.id,
+        vendorId: eventDetails.vendor_id,
+        bookingId,
+        hasToken: !!session.access_token
+      });
+
+      console.log('📤 Payment request cURL equivalent:', `
+curl --location '${apiUrl}' \\
+--header 'Content-Type: application/json' \\
+--header 'Authorization: Bearer ${session.access_token.substring(0, 20)}...' \\
+--data '${JSON.stringify(paymentPayload, null, 2)}'
+      `);
+
+      // Make API call
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(paymentPayload),
+      });
+
+      const responseData = await response.json();
+
+      console.log('📊 Payment request API response:', {
+        status: response.status,
+        ok: response.ok,
+        data: responseData
+      });
+
+      if (!response.ok) {
+        console.error('❌ Payment request failed:', responseData);
+        alert(`Payment request failed: ${responseData.message || responseData.error || 'Unknown error'}`);
+        return;
+      }
+
+      console.log('✅ Payment request successful!', responseData);
+
+      // If successful, redirect to PhonePe checkout URL
+      if (responseData.data?.instrumentResponse?.redirectInfo?.url) {
+        console.log('🔗 Redirecting to PhonePe checkout:', responseData.data.instrumentResponse.redirectInfo.url);
+        window.location.href = responseData.data.instrumentResponse.redirectInfo.url;
+      } else {
+        console.error('❌ No redirect URL in response:', responseData);
+        alert('Payment setup failed. No redirect URL received.');
+      }
+
+    } catch (error) {
+      console.error('💥 Payment request error:', error);
+      alert(`Payment request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   // Format date to human readable format
   const formatDate = (dateString: string) => {
     try {
@@ -544,6 +684,7 @@ const BookingPage: React.FC = () => {
             'contact_name' in apiData ? apiData.contact_name : undefined,
           contact_number:
             'contact_number' in apiData ? apiData.contact_number : undefined,
+          vendor_id: (apiData as any).vendor_id,
 
           // Experience-specific fields
           sub_category:
@@ -1097,14 +1238,17 @@ const BookingPage: React.FC = () => {
                   onClick={
                     eventDetails?.is_screening_allowed === true
                       ? handleRegistrationClick
-                      : () =>
-                          alert(
-                            'Booking functionality will be implemented soon!'
-                          )
+                      : handlePaymentRequest
                   }
-                  className="mb-4 w-full rounded-xl bg-black py-4 text-lg font-semibold text-white transition-colors hover:bg-gray-800"
+                  disabled={paymentLoading}
+                  className="mb-4 w-full rounded-xl bg-black py-4 text-lg font-semibold text-white transition-colors hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  {eventDetails?.is_screening_allowed === true
+                  {paymentLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Processing...
+                    </div>
+                  ) : eventDetails?.is_screening_allowed === true
                     ? user
                       ? 'Complete Your Registration'
                       : 'Register Now'
@@ -1112,12 +1256,18 @@ const BookingPage: React.FC = () => {
                 </button>
               ) : bookingStatus === 'approved' ? (
                 <button
-                  onClick={() =>
-                    alert('Payment functionality will be implemented soon!')
-                  }
-                  className="mb-4 w-full rounded-xl bg-green-600 py-4 text-lg font-semibold text-white transition-colors hover:bg-green-700"
+                  onClick={handlePaymentRequest}
+                  disabled={paymentLoading}
+                  className="mb-4 w-full rounded-xl bg-green-600 py-4 text-lg font-semibold text-white transition-colors hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  Pay Now
+                  {paymentLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Processing...
+                    </div>
+                  ) : (
+                    'Pay Now'
+                  )}
                 </button>
               ) : bookingStatus === 'rejected' ? null : null}
 
